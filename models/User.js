@@ -15,7 +15,7 @@ class User {
         this.last_name = data.last_name
         this.user_name = data.user_name
         this.display_name = data.display_name
-        this.user_email = data.user_email
+        this.user_email = data.email
         this.password = data.password,
         this.googleId = data.googleId,
         this.created_date = new Date()
