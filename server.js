@@ -4,6 +4,8 @@ const server = express()
 const cors = require('cors')
 const { connectMongoDB } = require('./db/config')
 const helmet = require('helmet')
+const authMiddleware = require('./middleware/authMiddleware')
+const cookieParser = require('cookie-parser');
 
 
 if (process.env.ENV_TYPE === 'production'){
@@ -16,9 +18,12 @@ if (process.env.ENV_TYPE === 'production'){
 
 server.use(express.json())
 server.use(cors({
-    origin: '*',
+    origin: 'http://localhost:5173',
     credentials: true,
-}))
+}));
+server.use(cookieParser());
+
+server.use(authMiddleware)
 
 connectMongoDB()
 

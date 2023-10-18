@@ -24,6 +24,9 @@ class User {
         this.isMod = false
         this.isArtist = false
         this.isCustomer = true
+        this.session_token = null
+        this.account_status = 'active',
+        this.online_status = 'offline'
     }
 
     async create_user_checks() {
@@ -66,17 +69,27 @@ class User {
                 isMod: this.isMod,
                 isArtist: this.isArtist,
                 isClient: this.isCustomer,
+                session_token: this.session_token,
+                account_status: this.account_status,
+                online_status: this.online_status,
+                attr1: null,
+                attr2: null,
+                attr3: null,
+                attr4: null,
+                attr5: null,
+                attr6: null,
+                attr7: null,
+                attr8: null,
             }
             const result = await db.collection('users').insertOne(newUser)
             return result
         } catch (err) {
-            console.log(err)
+            console.log(err) //TODO: Handle this error
         }
     }
 
     static checkIfUserNameExists = async (user_name) => {
         try {
-            console.log('Checking if username exists') //!REMOVE
             const userExists = await db.collection('users').findOne({ user_name: user_name })
 
             if (userExists) {
@@ -85,10 +98,46 @@ class User {
                 return false
             }
         } catch (error) {
-            console.log(error)
+            console.log(error) //TODO: Handle this error
         }
     }
 
+    static getUserByUserName = (user_name) => {
+        try {
+            const user = db.collection('users').findOne({ user_name: user_name })
+
+            if(!user){
+                return false
+            }
+
+            return user
+        } catch (error) {
+            console.log(error) //TODO: Handle this error
+            return false
+        }
+    }
+
+    static getUserByUNXID = (unxid) => {
+        try {
+            const user = db.collection('users').findOne({ unxid: unxid })
+
+            return user
+        } catch (error) {
+            console.log(error) //TODO: Handle this error
+        }
+    }
+
+    static updateUserDataUXID = async (property, value, unxid) => {
+        try {
+
+            await db.collection('users').updateOne({ unxid: unxid }, { $set: { [property]: value } })
+
+            return true
+        } catch (error) {
+            console.log(error) //TODO: Handle this error
+            return false
+        }
+    }
 
 }
 

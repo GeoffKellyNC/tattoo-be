@@ -14,6 +14,18 @@ router
     .route('/login-google')
     .get(authControllers.loginGoogle)
 
+router
+    .route('/login')
+    .post(authControllers.login)
+
+router
+    .route('/verify-user-access')
+    .get(authControllers.verifyUserAccess)
+
+router
+    .route('/logout')
+    .get(authControllers.logout)
+
 
 
 module.exports = router;

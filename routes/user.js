@@ -10,7 +10,7 @@ router
     .get(userControllers.checkUserNameExists)
 
 router
-    .route('/create-user')
+    .route('/register')
     .post(userControllers.createUser)
 
 
