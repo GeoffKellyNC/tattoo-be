@@ -41,11 +41,11 @@ exports.login = async (req, res) => {
 
 exports.logout = async (req, res) => {
     try {
-        const user = req.user
+        const unxid = req.headers['user_unx_id']
 
 
-        await User.updateUserDataUXID('session_token', '', user.unxid)
-        await User.updateUserDataUXID('online_status', 'offline', user.unxid)
+        await User.updateUserDataUXID('session_token', '', unxid)
+        await User.updateUserDataUXID('online_status', 'offline', unxid)
 
         res.clearCookie('auth-token')
 
@@ -59,9 +59,8 @@ exports.logout = async (req, res) => {
 
 exports.verifyUserAccess = (req, res) => {
     try {
+        console.log('verifyUserAccess: ', req.user)
         const user = req.user
-
-        console.log('user: ', user) //!REMOVE
 
         res.status(200).json(user)
 
