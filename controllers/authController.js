@@ -8,7 +8,17 @@ exports.login = async (req, res) => {
 
         const userData = await User.getUserByUserName(data.user_name)
 
+        let userProfileDetails;
+        let userContactDetails;
 
+        // Getting Client specific data.
+        if(userData.account_type = 'client'){
+            console.log('Getting Client Details...')
+            userProfileDetails = await User.getProfileDetailsClient(userData.unxid)
+            console.log('Getting Client Contact Details...')
+            userContactDetails = await User.getContactDetailsClient(userData.unxid)
+        }
+            
         if(!userData){
             res.status(400).json({message: 'User not found'})
             return
@@ -27,7 +37,7 @@ exports.login = async (req, res) => {
 
         await User.updateUserDataUXID('online_status', 'online', userData.unxid)
 
-        res.status(200).json({userData, jwtToken})
+        res.status(200).json({userData, jwtToken, userProfileDetails, userContactDetails})
 
         return
 
@@ -69,7 +79,3 @@ exports.verifyUserAccess = (req, res) => {
     }
 }
 
-exports.loginGoogle = function(req, res) {};
-
-
-exports.getLinkGoogle = function(req, res) {};

@@ -33,7 +33,8 @@ exports.createUser = async (req, res) => {
             return
         }
 
-        user.create_user_in_db()
+        const data = await user.create_user_in_db()
+        await user.setUpDatabaseDefaultsClient(data.unxid)
         res.status(200).json({message: 'User created successfully'})
 
 
@@ -74,23 +75,57 @@ exports.uploadProfileImage = async (req, res) => {
         });
 
         blobStream.on('finish', async () => {
-            console.log('Blob stream finished. Generating public URL...'); //! REMOVE
 
             const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
             
-            console.log(`Public URL generated: ${publicUrl}. Preparing to save to MongoDB...`); //! REMOVE
 
             // Save URL to MongoDB
-            const imageObj = await User.saveProfileImage(unxid, publicUrl, user_name);
+            const imageObj = await User.saveOrUpdateProfileImage(unxid, publicUrl, user_name);
             
-            console.log('Image URL saved to MongoDB. Sending response back...'); //! REMOVE
             res.status(200).json({ message: 'Uploaded successfully.', data: imageObj });
         });
 
-        console.log('Ending blob stream...'); //! REMOVE
         blobStream.end(req.file.buffer);
     } catch (error) {
         console.log('Error uploading profile image: ', error); //! REMOVE
         res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
 };
+
+exports.getActiveProfileImage = async (req, res) => {
+    try {
+        const user_unxid = req.headers['user_unx_id']
+
+
+        const activeImage = await User.getActiveProfileImage(user_unxid);
+
+        if (activeImage) {
+            res.status(200).json({ message: 'Active profile image found.', data: activeImage });
+        } else {
+            res.status(200).json({ message: 'No active profile image found.', data: null });
+        }
+    } catch (error) {
+        console.log('Error fetching active profile image:', error);
+        res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    }
+}
+
+exports.updateProfileDetailsClient = async (req, res) => {
+    try {
+        const data = req.body
+        const unxid = req.headers['user_unx_id']
+
+        const updatedUser = await User.setProfileDetailsClient(unxid, data)
+
+        if(!updatedUser){
+            res.status(400).json({message: 'Error updating profile details', data: null})
+            return
+        }
+
+        res.status(200).json({message: 'Profile details updated successfully', data: updatedUser})
+
+    } catch (error) {
+        console.log('Error updating profile details: ', error) //TODO: Handle this error
+        res.status(500).json({message: 'Error updating profile details', data: error})
+    }
+}

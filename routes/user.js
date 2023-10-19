@@ -19,5 +19,15 @@ router
     .route('/upload-profile-image')
     .post(multerUpload.single('profile-image'), userControllers.uploadProfileImage)
 
+router
+    .route('/get-profile-image')
+    .get(userControllers.getActiveProfileImage)
+
+router
+    .route('/update-client-profile-details')
+    .post(userControllers.updateProfileDetailsClient)
+
+    
+
 
 module.exports = router;

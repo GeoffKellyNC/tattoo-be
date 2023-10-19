@@ -28,7 +28,7 @@ class User {
         this.account_status = 'active',
         this.online_status = 'offline'
     }
-
+    //Registration Checks
     async create_user_checks() {
         try {
 
@@ -49,7 +49,7 @@ class User {
         }
     }
 
-
+    // Regiser User and create in DB
     async create_user_in_db() {
         try {
             const user_pass_hash = await hashUserPassword(this.password)
@@ -81,13 +81,14 @@ class User {
                 attr7: null,
                 attr8: null,
             }
-            const result = await db.collection('users').insertOne(newUser)
-            return result
+            await db.collection('users').insertOne(newUser)
+            return newUser
         } catch (err) {
             console.log(err) //TODO: Handle this error
         }
     }
 
+    // Login Checks
     static checkIfUserNameExists = async (user_name) => {
         try {
             const userExists = await db.collection('users').findOne({ user_name: user_name })
@@ -102,6 +103,7 @@ class User {
         }
     }
 
+    // Get user data. Core data artists and clients
     static getUserByUserName = (user_name) => {
         try {
             const user = db.collection('users').findOne({ user_name: user_name })
@@ -117,6 +119,8 @@ class User {
         }
     }
 
+
+    // Get core user data using unxid
     static getUserByUNXID = (unxid) => {
         try {
             const user = db.collection('users').findOne({ unxid: unxid })
@@ -127,6 +131,7 @@ class User {
         }
     }
 
+    // Make updates to user core data using unxid
     static updateUserDataUXID = async (property, value, unxid) => {
         try {
 
@@ -139,8 +144,30 @@ class User {
         }
     }
 
-    static saveProfileImage = async (user_unxid, image_url, user_name) => {
+    static async saveOrUpdateProfileImage(user_unxid, image_url, user_name) {
         try {
+            console.log('Starting saveOrUpdateProfileImage function...'); //!REMOVE
+            
+            // Step 1: Try to find and set existing active image to inactive
+            console.log(`Trying to find and set active image to inactive for user_unxid: ${user_unxid}`); //!REMOVE
+            const result = await db.collection('client-profile-image').findOneAndUpdate(
+                { 
+                    user_unxid: user_unxid, 
+                    is_active: true
+                }, 
+                { 
+                    $set: { is_active: false } 
+                }
+            );
+            
+            if (result && result.ok === 1 && result.value) {
+                console.log('Existing active image found and set to inactive.'); //!REMOVE
+            } else {
+                console.log('No active image found for the user, or failed to set it to inactive.'); //!REMOVE
+            }
+            
+            // Step 2: Insert the new image object as active
+            console.log('Inserting new image object as active...'); //!REMOVE
             const imageObj = {
                 user_unxid: user_unxid,
                 user_name: user_name,
@@ -152,15 +179,135 @@ class User {
                 deleted_date: null,
                 deleted_by: null,
             }
+            
+            const insertResult = await db.collection('client-profile-image').insertOne(imageObj);
+            
+            if (insertResult && insertResult.insertedCount === 1) {
+                console.log('Successfully inserted the new image object.'); //!REMOVE
+            } else {
+                console.log('Failed to insert the new image object.'); //!REMOVE
+            }
+            
+            return imageObj;
+        
+        } catch (error) {
+            console.log('Error encountered in saveOrUpdateProfileImage:', error); //!REMOVE
+            return false;
+        }
+    }
+    
 
-            await db.collection('client-profile-image').insertOne(imageObj)
+    static async getActiveProfileImage(user_unxid) {
+        try {
+            const activeImage = await db.collection('client-profile-image').findOne({
+                user_unxid: user_unxid,
+                is_active: true
+            });
+    
+            if (activeImage) {
+                return activeImage;
+            } else {
+                console.log('No active profile image found for user:', user_unxid);
+                return null;
+            }
+    
+        } catch (error) {
+            console.log('Error fetching active profile image:', error);
+            return null;
+        }
+    }
 
-            return imageObj
+     async setUpDatabaseDefaultsClient(unxid) {
+        try {
+            const defaultClientProfileDetails = {
+                user_unxid: unxid,
+                location_city: null,
+                location_state: null,
+                location_zip: null,
+                profile_tagline: null,
+                profile_description: null,
+                number_of_tattoos: null,
+                tattoo_style_preferences: null,
+                preferred_size_range: null,
+                allergies_or_skin_conditions: null,
+                personal_tattoo_story: null,
+            }
+
+            const defaultClientContactDetails = {
+                user_unxid: unxid,
+                contact_phone: {public: false, value: null},
+                contact_instagram: {public: false, value: null},
+                contact_snapchat: {public: false, value: null},
+                contact_x: {public: false, value: null},
+                contact_discord: {public: false, value: null},
+                contact_website: {public: false, value: null},
+                other_1: {public: false, value: null},
+                other_2: {public: false, value: null},
+            }
+    
+            await db.collection('client-user-details').insertOne(defaultClientProfileDetails)
+            await db.collection('client-contact-info').insertOne(defaultClientContactDetails)
+    
+            return true
+        } catch (error) {
+            console.log(error) //TODO: Handle this error
+            return false
+        }
+
+
+    }
+
+    static async setProfileDetailsClient(unxid, data) {
+        try {
+            const filter = { user_unxid: unxid }
+            const options = {new: true, upsert: true}
+
+            const res = await db.collection('client-user-details').findOneAndUpdate(filter, data, options)
+
+            return res
         } catch (error) {
             console.log(error) //TODO: Handle this error
             return false
         }
     }
+    
+
+    static async getProfileDetailsClient(unxid) {
+        try {
+            const res = await db.collection('client-user-details').findOne({ user_unxid: unxid })
+
+            return res
+        } catch (error) {
+            console.log(error) //TODO: Handle this error
+            return false
+        }
+    }
+
+    static async setContactDetailsClient(unxid, data) {
+        try {
+            const filter = { user_unxid: unxid }
+            const options = {new: true, upsert: true}
+
+            const res = await db.collection('client-contact-info').findOneAndUpdate(filter, data, options)
+
+            return res
+        } catch (error) {
+            console.log(error) //TODO: Handle this error
+            return false
+        }
+    }
+
+    static async getContactDetailsClient(unxid) {
+        try {
+            const res = await db.collection('client-contact-info').findOne({ user_unxid: unxid })
+
+            return res
+        } catch (error) {
+            console.log(error) //TODO: Handle this error
+            return false
+        }
+    }
+    
 
 }
 
