@@ -139,6 +139,29 @@ class User {
         }
     }
 
+    static saveProfileImage = async (user_unxid, image_url, user_name) => {
+        try {
+            const imageObj = {
+                user_unxid: user_unxid,
+                user_name: user_name,
+                image_id: uuid(),
+                image_url: image_url,
+                image_upload_date: new Date(),
+                is_active: true,
+                is_deleted: false,
+                deleted_date: null,
+                deleted_by: null,
+            }
+
+            await db.collection('client-profile-image').insertOne(imageObj)
+
+            return imageObj
+        } catch (error) {
+            console.log(error) //TODO: Handle this error
+            return false
+        }
+    }
+
 }
 
 module.exports = User;

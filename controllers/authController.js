@@ -59,7 +59,6 @@ exports.logout = async (req, res) => {
 
 exports.verifyUserAccess = (req, res) => {
     try {
-        console.log('verifyUserAccess: ', req.user)
         const user = req.user
 
         res.status(200).json(user)

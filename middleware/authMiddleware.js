@@ -4,7 +4,6 @@ const Auth = require('../models/Auth');  // Adjust this to the path of your Auth
 async function authMiddleware(req, res, next) {
     try {
 
-        console.log('req.path: ', req.path) //!REMOVE
         const excludedPaths = ['login', 'register', 'check-user-name']; 
 
 
@@ -16,8 +15,6 @@ async function authMiddleware(req, res, next) {
         const jwtToken = req.headers['auth-token'];
         const user_unxid = req.headers.user_unx_id;
 
-        console.log('jwtToken: ', jwtToken) //!REMOVE
-        console.log('user_unxid: ', user_unxid) //!REMOVE
 
     
         // Check if token exists
@@ -28,7 +25,6 @@ async function authMiddleware(req, res, next) {
         // Verify the token's authenticity
         const isValid = await Auth.verifyJWT(jwtToken, user_unxid);
         if (!isValid) {
-            console.log('Invalid token') //!REMOVE
             return res.status(401).json({ message: 'Invalid token.' });
         }
     

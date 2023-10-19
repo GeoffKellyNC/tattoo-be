@@ -8,6 +8,7 @@ const authMiddleware = require('./middleware/authMiddleware')
 const cookieParser = require('cookie-parser');
 
 
+
 if (process.env.ENV_TYPE === 'production'){
     console.log('RUNNING PRODUCTION')
     server.use(helmet())
