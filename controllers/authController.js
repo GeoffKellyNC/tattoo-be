@@ -9,6 +9,7 @@ exports.login = async (req, res) => {
         const userData = await User.getUserByUserName(data.user_name)
 
 
+            
         if(!userData){
             res.status(400).json({message: 'User not found'})
             return
@@ -21,13 +22,24 @@ exports.login = async (req, res) => {
             return
         }
 
+        let userProfileDetails;
+        let userContactDetails;
+        let clientUploadedImages;
+
+        // Getting Client specific data.
+        if(userData.account_type = 'client'){
+            userProfileDetails = await User.getProfileDetailsClient(userData.unxid)
+            userContactDetails = await User.getContactDetailsClient(userData.unxid)
+            clientUploadedImages = await User.getClientUploadedImages(userData.unxid)
+        }
+
         const {jwtToken, jwtExpire} = await Auth.generateJWT(userData)
 
         await User.updateUserDataUXID('session_token', jwtToken, userData.unxid)
 
         await User.updateUserDataUXID('online_status', 'online', userData.unxid)
 
-        res.status(200).json({userData, jwtToken})
+        res.status(200).json({userData, jwtToken, userProfileDetails, userContactDetails, clientUploadedImages})
 
         return
 
@@ -59,7 +71,6 @@ exports.logout = async (req, res) => {
 
 exports.verifyUserAccess = (req, res) => {
     try {
-        console.log('verifyUserAccess: ', req.user)
         const user = req.user
 
         res.status(200).json(user)
@@ -70,7 +81,3 @@ exports.verifyUserAccess = (req, res) => {
     }
 }
 
-exports.loginGoogle = function(req, res) {};
-
-
-exports.getLinkGoogle = function(req, res) {};

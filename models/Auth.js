@@ -51,7 +51,6 @@ const generateJWT = async (user) => {
 
 const verifyJWT = async (token, user_unxid) => {
     try {
-        console.log('Verify JWT token: ', token) //!REMOVE
         const secret = process.env.JWT_SECRET
     
         const decoded =  jwt.verify(token, secret)
@@ -62,7 +61,6 @@ const verifyJWT = async (token, user_unxid) => {
             return false
         }
     
-        console.log('JWT token verified') //!REMOVE
         return true;
     } catch (error) {
         console.log('Error verifying JWT: ', error) //TODO: Handle this error
