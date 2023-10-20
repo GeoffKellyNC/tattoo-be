@@ -54,7 +54,6 @@ exports.uploadProfileImage = async (req, res) => {
         const unxid = req.headers['user_unx_id']
 
         if (!req.file) {
-            console.log('No file detected in the request.'); //! REMOVE
             res.status(400).json({ message: 'Please upload a file.' });
             return;
         }
@@ -130,3 +129,76 @@ exports.updateProfileDetailsClient = async (req, res) => {
         res.status(500).json({message: 'Error updating profile details', data: error})
     }
 }
+
+exports.getClientUploadedImages = async (req, res) => {
+    try {
+        const unxid = req.headers['user_unx_id']
+
+        const images = await User.getClientUploadedImages(unxid)
+
+        if(!images){
+            res.status(400).json({message: 'Error fetching client images', data: null})
+            return
+        }
+
+        res.status(200).json({message: 'Client images fetched successfully', data: images})
+
+    } catch (error) {
+        console.log('Error fetching client images: ', error) //TODO: Handle this error
+        res.status(500).json({message: 'Error fetching client images', data: error})
+    }
+}
+    
+
+exports.uploadClientImages = async (req, res) => {
+    console.log('uploadClientImages function initiated'); //!REMOVE
+
+    try {
+        const user_name = req.headers.user_name;
+        const unxid = req.headers['user_unx_id']
+
+        
+        console.log('Headers processed:', { user_name, unxid }); //!REMOVE
+
+        if (!req.file) {
+            console.log('No File Detected in the request'); //!REMOVE
+            res.status(400).json({ message: 'Please upload a file', data: null });
+            return;
+        }
+
+        console.log('File detected, preparing to upload to cloud'); //!REMOVE
+
+        const blob = bucket.file(`client-uploaded-images/${req.file.originalname}-${unxid}`);
+        const blobStream = blob.createWriteStream({
+            metadata: {
+                contentType: req.file.mimetype
+            }
+        });
+
+        blobStream.on('error', (err) => {
+            console.log('Error detected during blob streaming to cloud storage:', err.message); //!REMOVE
+            res.status(500).json({ message: 'Error uploading file to cloud storage.', error: err.message });
+            return;
+        });
+
+        blobStream.on('finish', async () => {
+            console.log('File upload to cloud storage finished successfully'); //!REMOVE
+
+            const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
+
+            // Save URL to MongoDB
+            const imageObj = await User.saveClientUploadedImage(unxid, publicUrl, user_name);
+            
+            console.log('Image URL saved to MongoDB:', imageObj); //!REMOVE
+
+            res.status(200).json({ message: 'Uploaded successfully.', data: imageObj });
+        });
+
+        blobStream.end(req.file.buffer);
+
+    } catch (error) {
+        console.log('Error Uploading Client Image: ', error); //!REMOVE
+        res.status(500).json({ message: "Error Uploading Messages", data: error });
+    }
+}
+

@@ -309,8 +309,54 @@ class User {
             return false
         }
     }
-    
 
+    static async saveClientUploadedImage (unxid, url, user_name) {
+        try {
+            const imageObj = {
+                user_unxid: unxid,
+                user_name: user_name,
+                image_id: uuid(),
+                image_url: url,
+                image_upload_date: new Date(),
+                num_likes: 0,
+                num_comments: 0,
+                comments: [],
+                num_reports: 0,
+                title: null,
+                description: null,
+                is_active: true,
+                is_deleted: false,
+                deleted_date: null,
+                deleted_by: null,
+            }
+
+            await db.collection('client-uploaded-images').insertOne(imageObj)
+
+            return imageObj
+            
+        } catch (error) {
+            console.log('Error Saving Client Uploaded Image: ', error)
+            return false
+        }
+    }
+
+    static async getClientUploadedImages (unxid) {
+        try {
+            const query = {
+                user_unxid: unxid,
+                is_deleted: false,    
+                is_active: true      
+            };
+    
+            const res = await db.collection('client-uploaded-images').find(query).toArray();
+            
+            return res;
+        } catch (error) {
+            console.log('Error Getting Client Uploaded Images: ', error);
+            return false;
+        }
+    }
+    
 }
 
 module.exports = User;

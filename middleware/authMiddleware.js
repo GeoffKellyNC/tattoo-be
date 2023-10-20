@@ -3,7 +3,6 @@ const Auth = require('../models/Auth');  // Adjust this to the path of your Auth
 
 async function authMiddleware(req, res, next) {
     try {
-        console.log('Entering authMiddleware...'); //! REMOVE
         const excludedPaths = ['login', 'register', 'check-user-name']; 
 
 

@@ -24,13 +24,13 @@ exports.login = async (req, res) => {
 
         let userProfileDetails;
         let userContactDetails;
+        let clientUploadedImages;
 
         // Getting Client specific data.
         if(userData.account_type = 'client'){
-            console.log('Getting Client Details...')
             userProfileDetails = await User.getProfileDetailsClient(userData.unxid)
-            console.log('Getting Client Contact Details...')
             userContactDetails = await User.getContactDetailsClient(userData.unxid)
+            clientUploadedImages = await User.getClientUploadedImages(userData.unxid)
         }
 
         const {jwtToken, jwtExpire} = await Auth.generateJWT(userData)
@@ -39,7 +39,7 @@ exports.login = async (req, res) => {
 
         await User.updateUserDataUXID('online_status', 'online', userData.unxid)
 
-        res.status(200).json({userData, jwtToken, userProfileDetails, userContactDetails})
+        res.status(200).json({userData, jwtToken, userProfileDetails, userContactDetails, clientUploadedImages})
 
         return
 

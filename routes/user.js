@@ -27,6 +27,14 @@ router
     .route('/update-client-profile-details')
     .post(userControllers.updateProfileDetailsClient)
 
+router
+    .route('/upload-client-images')
+    .post(multerUpload.single('client-user-image'), userControllers.uploadClientImages)
+
+router
+    .route('/get-client-images')
+    .get(userControllers.getClientUploadedImages)
+
     
 
 
