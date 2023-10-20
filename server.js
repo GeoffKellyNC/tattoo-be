@@ -19,9 +19,11 @@ if (process.env.ENV_TYPE === 'production'){
 
 server.use(express.json())
 server.use(cors({
-    origin: 'http://localhost:5173',
+    origin: 'http://192.168.50.103:5173',
     credentials: true,
 }));
+
+
 server.use(cookieParser());
 
 server.use(authMiddleware)

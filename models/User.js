@@ -259,15 +259,17 @@ class User {
 
     static async setProfileDetailsClient(unxid, data) {
         try {
-            const filter = { user_unxid: unxid }
-            const options = {new: true, upsert: true}
-
-            const res = await db.collection('client-user-details').findOneAndUpdate(filter, data, options)
-
-            return res
+            const filter = { user_unxid: unxid };
+            delete data._id
+            const update = { $set: data }; 
+            const options = { new: true, upsert: true };
+    
+            await db.collection('client-user-details').findOneAndUpdate(filter, update, options);
+    
+            return data;
         } catch (error) {
-            console.log(error) //TODO: Handle this error
-            return false
+            console.log('Error SettingDetails Client: ', error);
+            return false;
         }
     }
     

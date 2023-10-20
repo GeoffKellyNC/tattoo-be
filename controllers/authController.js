@@ -8,16 +8,7 @@ exports.login = async (req, res) => {
 
         const userData = await User.getUserByUserName(data.user_name)
 
-        let userProfileDetails;
-        let userContactDetails;
 
-        // Getting Client specific data.
-        if(userData.account_type = 'client'){
-            console.log('Getting Client Details...')
-            userProfileDetails = await User.getProfileDetailsClient(userData.unxid)
-            console.log('Getting Client Contact Details...')
-            userContactDetails = await User.getContactDetailsClient(userData.unxid)
-        }
             
         if(!userData){
             res.status(400).json({message: 'User not found'})
@@ -29,6 +20,17 @@ exports.login = async (req, res) => {
         if(!passwordVerified){
             res.status(400).json({message: 'Incorrect Password'})
             return
+        }
+
+        let userProfileDetails;
+        let userContactDetails;
+
+        // Getting Client specific data.
+        if(userData.account_type = 'client'){
+            console.log('Getting Client Details...')
+            userProfileDetails = await User.getProfileDetailsClient(userData.unxid)
+            console.log('Getting Client Contact Details...')
+            userContactDetails = await User.getContactDetailsClient(userData.unxid)
         }
 
         const {jwtToken, jwtExpire} = await Auth.generateJWT(userData)

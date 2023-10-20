@@ -115,6 +115,7 @@ exports.updateProfileDetailsClient = async (req, res) => {
         const data = req.body
         const unxid = req.headers['user_unx_id']
 
+
         const updatedUser = await User.setProfileDetailsClient(unxid, data)
 
         if(!updatedUser){
