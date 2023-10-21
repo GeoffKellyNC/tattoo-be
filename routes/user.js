@@ -35,6 +35,10 @@ router
     .route('/get-client-images')
     .get(userControllers.getClientUploadedImages)
 
+router
+    .route('/get-paginated-users')
+    .get(userControllers.fetchPaginatedUsers);
+
     
 
 

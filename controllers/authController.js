@@ -25,13 +25,25 @@ exports.login = async (req, res) => {
         let userProfileDetails;
         let userContactDetails;
         let clientUploadedImages;
+        
+        console.log('User Data 1: ', userData)//!REMOVE
 
+        console.log('Log In User account type: ', userData.account_type)//!REMOVE
         // Getting Client specific data.
-        if(userData.account_type = 'client'){
+        if(userData.account_type === 'client'){
             userProfileDetails = await User.getProfileDetailsClient(userData.unxid)
             userContactDetails = await User.getContactDetailsClient(userData.unxid)
             clientUploadedImages = await User.getClientUploadedImages(userData.unxid)
         }
+
+        if(userData.account_type === 'artist'){
+            userProfileDetails = await User.getProfileDetailsClient(userData.unxid)
+            userContactDetails = await User.getContactDetailsClient(userData.unxid)
+            clientUploadedImages = await User.getClientUploadedImages(userData.unxid)
+        }
+        
+
+        console.log('User Data 2: ', userData)//!REMOVE
 
         const {jwtToken, jwtExpire} = await Auth.generateJWT(userData)
 

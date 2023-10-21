@@ -82,6 +82,7 @@ class User {
                 attr8: null,
             }
             await db.collection('users').insertOne(newUser)
+
             return newUser
         } catch (err) {
             console.log(err) //TODO: Handle this error
@@ -134,9 +135,7 @@ class User {
     // Make updates to user core data using unxid
     static updateUserDataUXID = async (property, value, unxid) => {
         try {
-
             await db.collection('users').updateOne({ unxid: unxid }, { $set: { [property]: value } })
-
             return true
         } catch (error) {
             console.log(error) //TODO: Handle this error
@@ -356,7 +355,82 @@ class User {
             return false;
         }
     }
-    
+
+    static async fetchPaginatedUsers(page = 1, limit = 10) {
+        const skipAmount = (page - 1) * limit;
+
+        try {
+            const users = await db.collection('users').aggregate([
+                {
+                    $lookup: {
+                        from: "client-user-details",
+                        localField: "unxid",
+                        foreignField: "user_unxid",
+                        as: "userDetails"
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "client-contact-info",
+                        localField: "unxid",
+                        foreignField: "user_unxid",
+                        as: "contactInfo"
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "client-profile-image",
+                        let: { user_unxid: "$unxid" },
+                        pipeline: [
+                            {
+                                $match: {
+                                    $expr: {
+                                        $and: [
+                                            { $eq: ["$user_unxid", "$$user_unxid"] },
+                                            { $eq: ["$is_active", true] }
+                                        ]
+                                    }
+                                }
+                            }
+                        ],
+                        as: "profileImage"
+                    }
+                },
+                { $unwind: { path: "$userDetails", preserveNullAndEmptyArrays: true } },
+                { $unwind: { path: "$contactInfo", preserveNullAndEmptyArrays: true } },
+                { $unwind: { path: "$profileImage", preserveNullAndEmptyArrays: true } },
+                {
+                    $skip: skipAmount
+                },
+                {
+                    $limit: limit
+                }
+            ]).toArray();
+
+            users.forEach(user => {
+                if (user.userDetails) {
+                    Object.assign(user, user.userDetails);
+                    delete user.userDetails;
+                }
+
+                if (user.contactInfo) {
+                    Object.assign(user, user.contactInfo);
+                    delete user.contactInfo;
+                }
+
+                if (user.profileImage) {
+                    user.profileImageUrl = user.profileImage.image_url;
+                    delete user.profileImage;
+                }
+            });
+
+            return users;
+        } catch (err) {
+            console.error("Error fetching paginated users:", err);
+            return null;
+        }
+    }
 }
+
 
 module.exports = User;

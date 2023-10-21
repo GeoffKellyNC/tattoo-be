@@ -35,6 +35,7 @@ exports.createUser = async (req, res) => {
 
         const data = await user.create_user_in_db()
         await user.setUpDatabaseDefaultsClient(data.unxid)
+        console.log('User created successfully: ', data.user_name) //TODO: Remove this line
         res.status(200).json({message: 'User created successfully'})
 
 
@@ -201,4 +202,23 @@ exports.uploadClientImages = async (req, res) => {
         res.status(500).json({ message: "Error Uploading Messages", data: error });
     }
 }
+
+exports.fetchPaginatedUsers = async (req, res) => {
+    try {
+        const { page, limit } = req.query;
+
+        const users = await User.fetchPaginatedUsers(parseInt(page, 10), parseInt(limit, 10));
+
+        if (!users) {
+            res.status(500).json({ message: 'Failed to fetch users.' });
+            return;
+        }
+
+        res.status(200).json({ data: users });
+    } catch (error) {
+        console.log('Error fetching paginated users:', error);
+        res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    }
+}
+
 
