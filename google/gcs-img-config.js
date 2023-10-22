@@ -1,8 +1,10 @@
 require('dotenv').config();
 const { Storage } = require('@google-cloud/storage');
 
+const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS)
+
 const storage = new Storage({
-  keyFilename: '/Users/geoff/Projects/Projects/tattoo/tattoo-be/googlekeys/gcs-credentials.json',
+  credentials: credentials,
   projectId: process.env.GOOGLE_IMAGE_PROJECT_ID
 });
 
