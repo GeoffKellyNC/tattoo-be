@@ -19,7 +19,7 @@ if (process.env.ENV_TYPE === 'production'){
 
 server.use(express.json())
 server.use(cors({
-    origin: 'http://192.168.50.103:5173',
+    origin: 'https://linkd-dev.netlify.app/',
     credentials: true,
 }));
 
