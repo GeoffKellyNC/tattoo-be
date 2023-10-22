@@ -8,7 +8,6 @@ const authMiddleware = require('./middleware/authMiddleware')
 const cookieParser = require('cookie-parser');
 
 
-
 if (process.env.ENV_TYPE === 'production'){
     console.log('RUNNING PRODUCTION')
     server.use(helmet())
@@ -34,8 +33,11 @@ server.use('/auth', require('./routes/auth'))
 server.use('/user', require('./routes/user'))
 
 
+const PORT = process.env.port || 9001;
+server.listen(PORT, () => {
+    console.log(`Server is running on port: ${PORT}....`);
+  });
 
 
-module.exports = server
 
 
