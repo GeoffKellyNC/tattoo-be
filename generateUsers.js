@@ -6,7 +6,6 @@ const main = async () => {
     let numberCreated = 35
 
     setInterval( async () => {
-        console.log(`Creating Client...`)
         const data = {
             user_name: `user${currentNumber}`,
             email: `user${currentNumber}@email.com`,
@@ -20,16 +19,14 @@ const main = async () => {
         try {
             const res = await axios.post('http://localhost:9001/user/register', data)
             if (res.status !== 200){
-                console.log('ERROR RES: ', res)
+                console.log('ERROR RES: ', res) //TODO: Handle Error (LOG)
             }
         } catch (error) {
-            console.log('Error Creating User: ', error)
+            console.log('Error Creating User: ', error) //TODO: Handle Error (LOG)
         }
-        console.log('User Created: ', data.user_name)
 
         currentNumber++
         numberCreated++
-        console.log('Created Users: ', numberCreated)
     }, 1000); 
 
 }

@@ -57,7 +57,7 @@ const verifyJWT = async (token, user_unxid) => {
     
     
         if (decoded.user_unxid != user_unxid) {
-            console.log('JWT token does not match user unxid') //!REMOVE
+            console.log('JWT token does not match user unxid') //TODO: Handle this error (LOG)
             return false
         }
     

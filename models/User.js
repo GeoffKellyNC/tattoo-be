@@ -45,7 +45,7 @@ class User {
             }
 
         } catch (error) {
-            console.log(error) //! TODO: Add error handling
+            console.log(error) // TODO: Add error handling
         }
     }
 
@@ -145,10 +145,7 @@ class User {
 
     static async saveOrUpdateProfileImage(user_unxid, image_url, user_name) {
         try {
-            console.log('Starting saveOrUpdateProfileImage function...'); //!REMOVE
             
-            // Step 1: Try to find and set existing active image to inactive
-            console.log(`Trying to find and set active image to inactive for user_unxid: ${user_unxid}`); //!REMOVE
             const result = await db.collection('client-profile-image').findOneAndUpdate(
                 { 
                     user_unxid: user_unxid, 
@@ -159,14 +156,6 @@ class User {
                 }
             );
             
-            if (result && result.ok === 1 && result.value) {
-                console.log('Existing active image found and set to inactive.'); //!REMOVE
-            } else {
-                console.log('No active image found for the user, or failed to set it to inactive.'); //!REMOVE
-            }
-            
-            // Step 2: Insert the new image object as active
-            console.log('Inserting new image object as active...'); //!REMOVE
             const imageObj = {
                 user_unxid: user_unxid,
                 user_name: user_name,
@@ -181,16 +170,10 @@ class User {
             
             const insertResult = await db.collection('client-profile-image').insertOne(imageObj);
             
-            if (insertResult && insertResult.insertedCount === 1) {
-                console.log('Successfully inserted the new image object.'); //!REMOVE
-            } else {
-                console.log('Failed to insert the new image object.'); //!REMOVE
-            }
-            
             return imageObj;
         
         } catch (error) {
-            console.log('Error encountered in saveOrUpdateProfileImage:', error); //!REMOVE
+            console.log('Error encountered in saveOrUpdateProfileImage:', error); //TODO: Handle Error (LOG)
             return false;
         }
     }
@@ -267,7 +250,7 @@ class User {
     
             return data;
         } catch (error) {
-            console.log('Error SettingDetails Client: ', error);
+            console.log('Error SettingDetails Client: ', error); //TODO Handle this error (Log)
             return false;
         }
     }
@@ -351,7 +334,7 @@ class User {
             
             return res;
         } catch (error) {
-            console.log('Error Getting Client Uploaded Images: ', error);
+            console.log('Error Getting Client Uploaded Images: ', error); //TODO: Handle this error (LOG)
             return false;
         }
     }
@@ -399,11 +382,31 @@ class User {
                 { $unwind: { path: "$userDetails", preserveNullAndEmptyArrays: true } },
                 { $unwind: { path: "$contactInfo", preserveNullAndEmptyArrays: true } },
                 { $unwind: { path: "$profileImage", preserveNullAndEmptyArrays: true } },
+                
                 {
                     $skip: skipAmount
                 },
                 {
                     $limit: limit
+                },
+                {
+                    $project: {
+                        password: 0,
+                        user_email: 0,
+                        session_token: 0,
+                        account_status: 0,
+                        isMod: 0,
+                        isAdmin: 0,
+                        attr1: 0,
+                        attr2: 0,
+                        attr3: 0,
+                        attr4: 0,
+                        attr5: 0,
+                        attr6: 0,
+                        attr7: 0,
+                        attr8: 0,
+                        user_unxid: 0
+                    }
                 }
             ]).toArray();
 
@@ -430,6 +433,99 @@ class User {
             return null;
         }
     }
+
+    static async fetchUserProfileByUnxid(unxid) {
+        try {
+            const users = await db.collection('users').aggregate([
+                {
+                    $match: {
+                        unxid: unxid
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "client-user-details",
+                        localField: "unxid",
+                        foreignField: "user_unxid",
+                        as: "userDetails"
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "client-contact-info",
+                        localField: "unxid",
+                        foreignField: "user_unxid",
+                        as: "contactInfo"
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "client-profile-image",
+                        let: { user_unxid: "$unxid" },
+                        pipeline: [
+                            {
+                                $match: {
+                                    $expr: {
+                                        $and: [
+                                            { $eq: ["$user_unxid", "$$user_unxid"] },
+                                            { $eq: ["$is_active", true] }
+                                        ]
+                                    }
+                                }
+                            }
+                        ],
+                        as: "profileImage"
+                    }
+                },
+                { $unwind: { path: "$userDetails", preserveNullAndEmptyArrays: true } },
+                { $unwind: { path: "$contactInfo", preserveNullAndEmptyArrays: true } },
+                { $unwind: { path: "$profileImage", preserveNullAndEmptyArrays: true } },
+                {
+                    $project: {
+                        password: 0,
+                        user_email: 0,
+                        session_token: 0,
+                        account_status: 0,
+                        isMod: 0,
+                        isAdmin: 0,
+                        attr1: 0,
+                        attr2: 0,
+                        attr3: 0,
+                        attr4: 0,
+                        attr5: 0,
+                        attr6: 0,
+                        attr7: 0,
+                        attr8: 0,
+                        user_unxid: 0
+                    }
+                }
+            ]).toArray();
+    
+            const user = users[0];  // Since we expect a single user
+    
+            if (user.userDetails) {
+                Object.assign(user, user.userDetails);
+                delete user.userDetails;
+            }
+    
+            if (user.contactInfo) {
+                Object.assign(user, user.contactInfo);
+                delete user.contactInfo;
+            }
+    
+            if (user.profileImage) {
+                user.profileImageUrl = user.profileImage.image_url;
+                delete user.profileImage;
+            }
+    
+            return user;
+        } catch (err) {
+            console.error("Error fetching user by unxid:", err);
+            return null;
+        }
+    }
+    
+    
 }
 
 

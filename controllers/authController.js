@@ -26,9 +26,7 @@ exports.login = async (req, res) => {
         let userContactDetails;
         let clientUploadedImages;
         
-        console.log('User Data 1: ', userData)//!REMOVE
 
-        console.log('Log In User account type: ', userData.account_type)//!REMOVE
         // Getting Client specific data.
         if(userData.account_type === 'client'){
             userProfileDetails = await User.getProfileDetailsClient(userData.unxid)
@@ -43,7 +41,6 @@ exports.login = async (req, res) => {
         }
         
 
-        console.log('User Data 2: ', userData)//!REMOVE
 
         const {jwtToken, jwtExpire} = await Auth.generateJWT(userData)
 

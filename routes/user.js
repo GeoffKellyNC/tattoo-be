@@ -39,6 +39,10 @@ router
     .route('/get-paginated-users')
     .get(userControllers.fetchPaginatedUsers);
 
+router
+    .route('/get-user-profile-by-id/:user_id')
+    .get(userControllers.fetchUserProfileByUnxid);
+
     
 
 
