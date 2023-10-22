@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const crypto = require('crypto')
 
  const hashUserPassword = async (user_pass) => {
     try {
@@ -65,7 +66,27 @@ const verifyJWT = async (token, user_unxid) => {
     } catch (error) {
         console.log('Error verifying JWT: ', error) //TODO: Handle this error
     }
+
     
+    
+}
+
+const  createVerificationCode = async (unxid) => {
+    try {
+        const verificationCode = crypto.randomBytes(32).toString('hex')
+
+        await db.collection('email-auth-token').updateOne(
+            { user_unxid: unxid },
+            { $set: { verificationCode: verificationCode, isVerified: false } },
+            { upsert: true } 
+        );
+        
+
+        return verificationCode;
+    } catch (error) {
+        console.log('Error generating verification code:', error); // TODO: Add error handling
+        return null;
+    }
 }
 
 
