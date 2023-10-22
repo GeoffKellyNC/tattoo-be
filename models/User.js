@@ -16,6 +16,7 @@ class User {
         this.user_name = data.user_name
         this.display_name = data.display_name
         this.user_email = data.email
+        this.user_email_verified = false
         this.password = data.password,
         this.googleId = data.googleId,
         this.created_date = new Date()
@@ -61,6 +62,7 @@ class User {
                 user_name: this.user_name,
                 display_name: this.display_name,
                 user_email: this.user_email,
+                email_verified: this.user_email_verified,
                 password: user_pass_hash,
                 googleId: this.googleId,
                 created_date: this.created_date,
@@ -520,8 +522,51 @@ class User {
     
             return user;
         } catch (err) {
-            console.error("Error fetching user by unxid:", err);
+            console.error("Error fetching user by unxid:", err); //TODO: Handle this error (LOG)
             return null;
+        }
+    }
+
+    static async setUpArtistDefaults(unxid) {
+        try {
+            let defaultObject = {
+                user_unxid: unxid,
+                years_experience: null,
+                specializations: [],
+                portfolio: null,
+                is_licenced: false,
+                is_verified: false,
+                studio_affiliation: false,
+                studio_name: null,
+                studio_url: null,
+                is_pay_hourly: false,
+                is_pay_fixed: false,
+                pay_hourly_rate: null,
+                pay_fixed_min: null,
+                pay_fixed_max: null,
+                deposit_required: false,
+                artist_rating_count: null,
+                artist_rating_total: null,
+                artist_rating_average: null,
+                artist_reviews: [],
+                artist_reviews_count: null,
+                artist_reviews_total: null, 
+                uses_booking_system: false,
+                booking_system_url: null,
+                cerifications: [],
+                awards: [],
+                payment_methods: [],
+                artist_mediums: [],
+                artist_equipment: []
+
+            }
+
+            await db.collection('artist-user-details').insertOne(defaultObject)
+
+            return defaultObject
+            
+        } catch (error) {
+            console.log('Error Setting Up Artist Defaults: ', error) //TODO: Handle this error (LOG)
         }
     }
     

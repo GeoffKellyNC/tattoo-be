@@ -25,6 +25,9 @@ exports.login = async (req, res) => {
         let userProfileDetails;
         let userContactDetails;
         let clientUploadedImages;
+
+        // Artist specific data.
+        let artistDetials;
         
 
         // Getting Client specific data.
@@ -38,6 +41,7 @@ exports.login = async (req, res) => {
             userProfileDetails = await User.getProfileDetailsClient(userData.unxid)
             userContactDetails = await User.getContactDetailsClient(userData.unxid)
             clientUploadedImages = await User.getClientUploadedImages(userData.unxid)
+            artistDetials = await User.setUpArtistDefaults(userData.unxid)
         }
         
 
