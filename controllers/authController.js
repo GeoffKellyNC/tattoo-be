@@ -42,7 +42,7 @@ exports.login = async (req, res) => {
             userProfileDetails = await User.getProfileDetailsClient(userData.unxid)
             userContactDetails = await User.getContactDetailsClient(userData.unxid)
             clientUploadedImages = await User.getClientUploadedImages(userData.unxid)
-            artistDetials = await User.setUpArtistDefaults(userData.unxid)
+            artistDetials = await User.getArtistDetails(userData.unxid)
         }
         
 

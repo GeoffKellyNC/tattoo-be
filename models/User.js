@@ -582,6 +582,17 @@ class User {
         }
     }
 
+    static async getArtistDetails(unxid) {
+        try {
+            const res = await db.collection('user-artists-data').findOne({ user_unxid: unxid })
+
+            return res
+        } catch (error) {
+            console.log(error) //TODO: Handle this error
+            return false
+        }
+    }
+
     static async updateUserEmail(unxid, email) {
         try {
             await db.collection('users').updateOne({ unxid: unxid }, { $set: { user_email: email } })
