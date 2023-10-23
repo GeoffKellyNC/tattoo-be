@@ -4,6 +4,8 @@ const nodemailer = require('nodemailer')
 
 const SERVER_URL = process.env.LOCAL_MODE ? 'http://192.168.50.103:9001' : process.env.SERVER_URL
 
+const frontEndURL = process.env.LOCAL_MODE ? 'http://192.168.50.103:5173' : 'https://linkd-dev.netlify.app'
+
 const sendResetPassEmail = async (unxid, user_email, token) => {
     try {
         let transporter = nodemailer.createTransport({
@@ -18,7 +20,7 @@ const sendResetPassEmail = async (unxid, user_email, token) => {
             from: process.env.EMAIL_USER,
             to: user_email,
             subject: "LINK'D Password Reset",
-            text: `Click here to reset your password with LINK'D APP: ${SERVER_URL}/auth/reset-password?token=${token}&unxid=${unxid}`
+            text: `Click here to reset your password with LINK'D APP: ${frontEndURL}/reset-password/${token}/${unxid}`
         };
         
         transporter.sendMail(mailOptions, function(error, info){

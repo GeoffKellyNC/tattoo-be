@@ -162,7 +162,7 @@ exports.updateUserPassword = async (req, res) => {
 
 exports.sendResetPasswordEmail = async (req, res) => {
     try {
-        const user_email = req.body
+        const user_email = req.body.user_email.trim()
 
         if(!user_email){
             res.status(401).json({message: 'Error Not Valid'})
@@ -170,6 +170,8 @@ exports.sendResetPasswordEmail = async (req, res) => {
         }
 
         const unxid = await User.getUserIdByEmail(user_email)
+
+        console.log("unxid: ", unxid) //!REMOVE
 
         if(!unxid){
             res.status(401).json({message: "Error resetting password. Code: x459"})
@@ -181,7 +183,7 @@ exports.sendResetPasswordEmail = async (req, res) => {
         const emailSent = await sendResetPassEmail(unxid, user_email, token)
 
         if(!emailSent) {
-            res.status(500).json({message: 'Server Errorl. Email not sent'})
+            res.status(500).json({message: 'Server Error. Email not sent'})
             return
         }
 
@@ -196,8 +198,10 @@ exports.sendResetPasswordEmail = async (req, res) => {
 
 exports.resetUserPassword = async (req, res) => {
     try {
-        const newPassword = req.body
-        const { token, unxid} = req.query
+        const newPassword = req.body.newPassword
+        const unxid = req.body.unxid
+        const token = req.body.token
+        
 
         if(!newPassword || !token || !unxid){
             res.status(401).json({message: "Error resetting Password 0x84949"})
@@ -211,7 +215,9 @@ exports.resetUserPassword = async (req, res) => {
             return
         }
 
-        await Auth.updateUserPassword(unxid, newPassword)
+        const encryptedPassword = await Auth.hashUserPassword(newPassword)
+
+        await Auth.updateUserPassword(unxid, encryptedPassword)
 
         res.status(200).json({message: "Password updated successfully. Please login with your new password."})
 

@@ -20,7 +20,7 @@ router
 
 router
     .route('/verify-email')
-    .get(authControllers.verifyEmailController)
+    .post(authControllers.verifyEmailController)
 
 router
     .route('/update-user-password')
@@ -29,6 +29,10 @@ router
 router
     .route('/reset-password')
     .post(authControllers.resetUserPassword)
+
+router
+    .route('/reset-password-verify')
+    .post(authControllers.sendResetPasswordEmail)
 
 
 

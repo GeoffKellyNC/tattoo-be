@@ -124,9 +124,9 @@ class User {
 
 
     // Get core user data using unxid
-    static getUserByUNXID = (unxid) => {
+    static getUserByUNXID = async (unxid) => {
         try {
-            const user = db.collection('users').findOne({ unxid: unxid })
+            const user = await db.collection('users').findOne({ unxid: unxid })
 
             return user
         } catch (error) {
@@ -134,9 +134,10 @@ class User {
         }
     }
 
-    static getUserIdByEmail = (user_email) => {
+    static getUserIdByEmail = async (user_email) => {
         try {
-            const user = db.collection('users').findOne({ user_email: user_email })
+            const user = await db.collection('users').findOne({ user_email: user_email })
+
 
             return user.unxid
         } catch (error) {
