@@ -20,7 +20,7 @@ router
 
 router
     .route('/verify-email')
-    .post(authControllers.verifyEmailController)
+    .get(authControllers.verifyEmailController)
 
 router
     .route('/update-user-password')
