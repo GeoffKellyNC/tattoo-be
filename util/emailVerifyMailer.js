@@ -1,9 +1,9 @@
 require("dotenv").config()
 const nodemailer = require('nodemailer');
 
+const SERVER_URL = process.env.LOCAL_MODE ? 'http://192.168.50.103:9001' : process.env.SERVER_URL
 
-
-export default sendVerificationEmail = async (unxid, user_email, token) => {
+const sendVerificationEmail = async (unxid, user_email, token) => {
     try {
         let transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -17,7 +17,7 @@ export default sendVerificationEmail = async (unxid, user_email, token) => {
             from: process.env.EMAIL_USER,
             to: user_email,
             subject: "LINK'D Email Verification",
-            text: `Click here to verify your email with LINK'D APP: ${process.env.SERVER_URL}/verify?token=${token}&unxid=${unxid}`
+            text: `Click here to verify your email with LINK'D APP: ${SERVER_URL}/auth/verify-email?token=${token}&unxid=${unxid}`
         };
         
         transporter.sendMail(mailOptions, function(error, info){
@@ -32,3 +32,5 @@ export default sendVerificationEmail = async (unxid, user_email, token) => {
         console.log('Error sending verification email: ', error) //TODO: Handle this error (LOG)
     }
 }
+
+module.exports = sendVerificationEmail

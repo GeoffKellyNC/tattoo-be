@@ -1,6 +1,9 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
+const { mongo } = require('../db/config');
+
+const db = mongo.db(process.env.MONGO_DB_NAME)
 
  const hashUserPassword = async (user_pass) => {
     try {
@@ -89,10 +92,42 @@ const  createVerificationCode = async (unxid) => {
     }
 }
 
+const verifyEmailCode = async (unxid, emailCode) => {
+    try {
+        const emailCodeDoc = await db.collection('email-auth-token').findOne({ user_unxid: unxid });
+
+        if (!emailCodeDoc) {
+            return false;
+        }
+
+        const isValid = emailCodeDoc.verificationCode === emailCode;
+
+        if (isValid) {
+            await db.collection('email-auth-token').updateOne(
+                { user_unxid: unxid },
+                { $set: { isVerified: true } }
+            );
+
+            await db.collection('users').updateOne(
+                { unxid: unxid },
+                { $set: { email_verified: true } }
+            )
+        }
+
+        return isValid;
+    } catch (error) {
+        console.log('Error verifying email code:', error); // TODO: Add error handling
+        return false;
+    }
+
+}
+
 
 module.exports = {
     hashUserPassword,
     comparePassHash,
     generateJWT,
-    verifyJWT
+    verifyJWT,
+    createVerificationCode,
+    verifyEmailCode
 }

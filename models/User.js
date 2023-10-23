@@ -23,8 +23,8 @@ class User {
         this.account_type = data.account_type
         this.isAdmin = false
         this.isMod = false
-        this.isArtist = false
-        this.isCustomer = true
+        this.isArtist = data.account_type.toLowerCase() === 'artist' ? true : false
+        this.isClient = data.account_type.toLowerCase() === 'client' ? true : false
         this.session_token = null
         this.account_status = 'active',
         this.online_status = 'offline'
@@ -70,7 +70,7 @@ class User {
                 isAdmin: this.isAdmin,
                 isMod: this.isMod,
                 isArtist: this.isArtist,
-                isClient: this.isCustomer,
+                isClient: this.isClient,
                 session_token: this.session_token,
                 account_status: this.account_status,
                 online_status: this.online_status,
@@ -561,7 +561,7 @@ class User {
 
             }
 
-            await db.collection('artist-user-details').insertOne(defaultObject)
+            await db.collection('user-artists-data').insertOne(defaultObject)
 
             return defaultObject
             

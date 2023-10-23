@@ -8,6 +8,7 @@ const authMiddleware = require('./middleware/authMiddleware')
 const cookieParser = require('cookie-parser');
 
 
+
 if (process.env.ENV_TYPE === 'production'){
     console.log('RUNNING PRODUCTION')
     server.use(helmet())
@@ -17,10 +18,19 @@ if (process.env.ENV_TYPE === 'production'){
 
 
 server.use(express.json())
-server.use(cors({
-    origin: 'https://linkd-dev.netlify.app',
-    credentials: true,
-}));
+
+if(process.env.LOCAL_MODE) {
+    server.use(cors({
+        origin: 'http://192.168.50.103:5173',
+        credentials: true,
+    }));
+} else {
+    server.use(cors({
+        origin: 'https://linkd-dev.netlify.app',
+        credentials: true,
+    }));
+}
+
 
 
 server.use(cookieParser());

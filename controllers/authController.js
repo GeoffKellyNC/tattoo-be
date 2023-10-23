@@ -94,3 +94,30 @@ exports.verifyUserAccess = (req, res) => {
     }
 }
 
+
+exports.verifyEmailController = async (req, res) => {
+    try{
+        const { token, unxid } = req.query;
+
+
+        if (!token || !unxid) {
+            res.status(400).send('Missing required parameters.');
+            return;
+        }
+
+
+        const isValid = await Auth.verifyEmailCode(unxid, token);
+
+        if (!isValid) {
+            res.status(400).send('Invalid or expired token.');
+            return;
+        }
+
+        res.status(200).send('<h1> Email Verified Successfully Please login. </h1>');
+
+    } catch (error) {
+        console.log('Error verifying email: ', error) //TODO: Handle this error
+        res.status(500).json({message: 'Error verifying email', error})
+    }
+}
+

@@ -18,6 +18,11 @@ router
     .route('/logout')
     .post(authControllers.logout)
 
+router
+    .route('/verify-email')
+    .get(authControllers.verifyEmailController)
+
+
 
 
 module.exports = router;
