@@ -243,4 +243,27 @@ exports.fetchUserProfileByUnxid = async (req, res) => {
     }
 }
 
+exports.updateUserEmailForVerification = async (req, res) => {
+    try {
+        const unxid = req.headers['user_unx_id']
+        const { email } = req.body;
+
+        const updatedEmail = await User.updateUserEmail(unxid, email);
+
+        if (!updatedEmail) {
+            res.status(500).json({ message: 'Failed to update user email.' });
+            return;
+        }
+
+        const verificationCode = await Auth.createVerificationCode(unxid);
+
+        await sendVerificationEmail(unxid, updatedEmail, verificationCode);
+
+        res.status(200).json({ message: `Updated! New link sent to ${updatedEmail}` });
+    } catch (error) {
+        console.log('Error updating user email:', error);
+        res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    }
+}
+
 

@@ -569,6 +569,16 @@ class User {
             console.log('Error Setting Up Artist Defaults: ', error) //TODO: Handle this error (LOG)
         }
     }
+
+    static async updateUserEmail(unxid, email) {
+        try {
+            await db.collection('users').updateOne({ unxid: unxid }, { $set: { user_email: email } })
+            return email
+        } catch (error) {
+            console.log(error) //TODO: Handle this error
+            return false
+        }
+    }
     
     
 }
