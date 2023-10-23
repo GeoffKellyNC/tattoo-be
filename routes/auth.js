@@ -26,6 +26,10 @@ router
     .route('/update-user-password')
     .post(authControllers.updateUserPassword)
 
+router
+    .route('/reset-password')
+    .post(authControllers.resetUserPassword)
+
 
 
 
