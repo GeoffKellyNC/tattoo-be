@@ -134,6 +134,17 @@ class User {
         }
     }
 
+    static getUserIdByEmail = (user_email) => {
+        try {
+            const user = db.collection('users').findOne({ user_email: user_email })
+
+            return user.unxid
+        } catch (error) {
+            console.log(error) //TODO: Handle this error
+            return false
+        }
+    }
+
     // Make updates to user core data using unxid
     static updateUserDataUXID = async (property, value, unxid) => {
         try {

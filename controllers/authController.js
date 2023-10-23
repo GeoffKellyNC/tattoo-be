@@ -1,5 +1,6 @@
 const User = require('../models/User')
 const Auth = require('../models/Auth')
+const sendResetPassEmail = require('../util/resetPasswordMailer')
 
 exports.login = async (req, res) => {
     try {
@@ -156,6 +157,67 @@ exports.updateUserPassword = async (req, res) => {
     } catch (error) {
         console.log('Error Updating User Password: ', error)//TODO: Handle this error (LOG)
         res.status(500).json({message: 'Error updating Password', data: error})
+    }
+}
+
+exports.sendResetPasswordEmail = async (req, res) => {
+    try {
+        const user_email = req.body
+
+        if(!user_email){
+            res.status(401).json({message: 'Error Not Valid'})
+            return
+        }
+
+        const unxid = await User.getUserIdByEmail(user_email)
+
+        if(!unxid){
+            res.status(401).json({message: "Error resetting password. Code: x459"})
+            return
+        }
+        
+        const token = await Auth.createResetToken(unxid)
+
+        const emailSent = await sendResetPassEmail(unxid, user_email, token)
+
+        if(!emailSent) {
+            res.status(500).json({message: 'Server Errorl. Email not sent'})
+            return
+        }
+
+        res.status(200).json({message: "If your email is found please an email will be sent to your inbox. Please check spam folder if you do not see an email from LINK'D"})
+
+    } catch (error) {
+        console.log("Error sending Password reset email") //TODO: Handle this error (LOG)
+        res.status(500).json({message: "Server Error updating password"})
+        return
+    }
+}
+
+exports.resetUserPassword = async (req, res) => {
+    try {
+        const newPassword = req.body
+        const { token, unxid} = req.query
+
+        if(!newPassword || !token || !unxid){
+            res.status(401).json({message: "Error resetting Password 0x84949"})
+            return
+        }
+
+        const tokenValid = await Auth.verifyResetToken(unxid, token)
+
+        if(!tokenValid){
+            res.status(401).json({message: "Token is no longer valid. Please request a new password reset."})
+            return
+        }
+
+        await Auth.updateUserPassword(unxid, newPassword)
+
+        res.status(200).json({message: "Password updated successfully. Please login with your new password."})
+
+    } catch (error) {
+        console.log("Error resetting password: ", error) 
+        res.status(500).json({message: "Error resetting password"})
     }
 }
 

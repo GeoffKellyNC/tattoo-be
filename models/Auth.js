@@ -74,6 +74,62 @@ const verifyJWT = async (token, user_unxid) => {
     
 }
 
+const verifyResetToken = async (unxid, resetCode) => {
+    try {
+            const resetTokenDoc = await db.collection('pass-reset-token').findOne({ user_unxid: unxid });
+
+            if (!resetTokenDoc) {
+                return false;
+            }
+
+            const isValid = resetTokenDoc.resetCode === resetCode;
+
+            if(!isValid) {
+                return false;
+            }
+
+            if(!resetTokenDoc.isValid) {
+                return false;
+            }
+
+            const currentTimestamp = Math.floor(Date.now() / 1000); 
+            const createdTimestamp = Math.floor(resetTokenDoc.created / 1000); 
+
+            if (currentTimestamp - createdTimestamp > 7200) { // 2 hours
+                return false;
+            }
+
+            await db.collection('pass-reset-token').updateOne(
+                { user_unxid: unxid },
+                { $set: { isValid: false } }
+            );
+
+            return true;
+        }
+    catch (error) {
+        console.log('Error verifying reset token:', error); // TODO: Add error handling
+        return false;
+    }
+}
+
+const createResetToken = async (unxid) => {
+    try {
+        const resetCode = crypto.randomBytes(64).toString('hex')
+
+        await db.collection('pass-reset-token').updateOne(
+            {user_unxid: unxid},
+            {$set: {resetCode: resetCode, isValid: true, created: Date.now()}},
+            { upsert: true }
+        )
+
+        return resetCode
+
+    } catch (error) {
+        console.log('Error generating reset code:', error); // TODO: Add error handling
+        return false;
+    }
+}
+
 const  createVerificationCode = async (unxid) => {
     try {
         const verificationCode = crypto.randomBytes(32).toString('hex')
@@ -145,6 +201,8 @@ module.exports = {
     verifyJWT,
     createVerificationCode,
     verifyEmailCode,
-    updateUserPassword
+    updateUserPassword,
+    createResetToken,
+    verifyResetToken
 
 }
