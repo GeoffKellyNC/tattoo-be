@@ -1,5 +1,7 @@
 const User = require('../models/User')
+const Auth = require('../models/Auth')
 const { storage, bucket } = require('../google/gcs-img-config');
+const sendVerificationEmail = require('../util/emailVerifyMailer');
 
 
 // Return True if username is taken and false if it is available
@@ -35,6 +37,14 @@ exports.createUser = async (req, res) => {
 
         const data = await user.create_user_in_db()
         await user.setUpDatabaseDefaultsClient(data.unxid)
+        if(data.account_type === 'artist'){
+            await user.setUpDatabaseDefaultsArtist(data.unxid)
+        }
+
+        const verificationCode = await Auth.createVerificationCode(data.unxid)
+
+        await sendVerificationEmail(data.unxid, data.user_email, verificationCode)
+        
         res.status(200).json({message: 'User created successfully'})
 
 
