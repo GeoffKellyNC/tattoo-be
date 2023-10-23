@@ -43,6 +43,10 @@ router
     .route('/get-user-profile-by-id/:user_id')
     .get(userControllers.fetchUserProfileByUnxid);
 
+router
+    .route('/update-verificatoin-email')
+    .post(userControllers.updateUserEmailForVerification);
+
     
 
 
