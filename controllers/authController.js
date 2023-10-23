@@ -121,3 +121,42 @@ exports.verifyEmailController = async (req, res) => {
     }
 }
 
+exports.updateUserPassword = async (req, res) => {
+    try {
+        const unxid = req.headers["user_unx_id"]
+        const newPassword = req.body.newPassword
+        const currentPassword = req.body.currentPassword
+        
+        const userData = await User.getUserByUNXID(unxid)
+
+        if(!userData){
+            res.status(400).json({message: 'User not found'})
+            return
+        }
+
+        const currentValid = await Auth.comparePassHash(currentPassword, userData.password)
+
+        if(!currentValid){
+            res.status(400).json({message: 'Incorrect Password'})
+            return
+        }
+
+        const newHashedPass = await Auth.hashUserPassword(newPassword)
+
+        const updated = await Auth.updateUserPassword(unxid, newHashedPass)
+
+        if(!updated){
+            res.status(400).json({message: 'Error updating password'})
+            return
+        }
+
+        res.status(200).json({message: 'Password updated successfully'})
+
+
+    } catch (error) {
+        console.log('Error Updating User Password: ', error)//TODO: Handle this error (LOG)
+        res.status(500).json({message: 'Error updating Password', data: error})
+    }
+}
+
+

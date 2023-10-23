@@ -123,11 +123,28 @@ const verifyEmailCode = async (unxid, emailCode) => {
 }
 
 
+const updateUserPassword = async (user_unxid, new_password) => {
+    try {
+        await db.collection('users').updateOne(
+            { unxid: user_unxid },
+            { $set: { password: new_password } }
+        );
+
+        return true;
+    } catch (error) {
+        console.log('Error updating user password: ', error) //TODO: Handle this error
+        return false;
+    }
+}
+
+
 module.exports = {
     hashUserPassword,
     comparePassHash,
     generateJWT,
     verifyJWT,
     createVerificationCode,
-    verifyEmailCode
+    verifyEmailCode,
+    updateUserPassword
+
 }
