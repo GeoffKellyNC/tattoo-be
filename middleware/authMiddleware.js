@@ -3,6 +3,12 @@ const Auth = require('../models/Auth');  // Adjust this to the path of your Auth
 
 async function authMiddleware(req, res, next) {
     try {
+        const formatedDate = new Date(Date.now()).toLocaleString('en-US', { timeZone: 'America/New_York' });
+        console.log(`
+            Route Hit!
+            Current time: ${formatedDate}
+            req.path: ${req.path}
+        `)
         const excludedPaths = ['login', 'register', 'check-user-name', 'verify-email', 'reset-password-verify','reset-password' ]; 
 
 

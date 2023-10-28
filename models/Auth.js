@@ -21,7 +21,6 @@ const db = mongo.db(process.env.MONGO_DB_NAME)
 
  const comparePassHash = async (password, stored_hash) => {
     try {
-        
         const isSame = await bcrypt.compare(password, stored_hash)
 
         return isSame ? true : false

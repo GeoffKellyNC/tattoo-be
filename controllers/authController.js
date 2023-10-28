@@ -9,14 +9,14 @@ exports.login = async (req, res) => {
 
         const userData = await User.getUserByUserName(data.user_name)
 
-
+        const storedPassword = await User.getUserPassword(userData.unxid)
             
-        if(!userData){
+        if(!userData || !storedPassword){
             res.status(400).json({message: 'User not found'})
             return
         }
 
-        const passwordVerified = await Auth.comparePassHash(data.password, userData.password)
+        const passwordVerified = await Auth.comparePassHash(data.password, storedPassword)
 
         if(!passwordVerified){
             res.status(400).json({message: 'Incorrect Password'})

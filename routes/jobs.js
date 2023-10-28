@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const jobControllers = require('../controllers/jobController');
+const multerUpload = require('../middleware/uploadMiddleware');
 
 
 router
     .route('/create-job')
-    .post(jobControllers.createJob)
+    .post(jobControllers.createJob); 
 
 router
     .route('/get-all-active-jobs')

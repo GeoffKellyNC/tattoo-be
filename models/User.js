@@ -106,10 +106,20 @@ class User {
         }
     }
 
+    static getUserPassword = async (unxid) => {
+        try {
+            const user = await db.collection('users').findOne({ unxid: unxid })
+
+            return user.password
+        } catch (error) {
+            console.log(error) //TODO: Handle this error
+        }
+    }
+
     // Get user data. Core data artists and clients
     static getUserByUserName = (user_name) => {
         try {
-            const user = db.collection('users').findOne({ user_name: user_name })
+            const user = db.collection('users').findOne({ user_name: user_name }, { projection: { password: 0 } })
 
             if(!user){
                 return false
