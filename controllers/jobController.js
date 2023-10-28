@@ -24,6 +24,30 @@ exports.createJob = async (req, res) => {
     }
 }
 
+exports.addPhotosToJob = async (req, res) => {
+    try {
+        const job_id  = req.body.jobId;
+        const unxid = req.headers["user_unx_id"];
+        const files = req.files;
+
+        console.log('Number of Photos uploaded: ', files.length) //!REMOVE
+
+        await files.forEach(file => {
+            console.log('Uploading for Job:', job_id)
+            console.log('Uploading File: ', file)
+            Job.uploadJobPhoto(unxid, file, job_id)
+            console.log('Uploaded....')
+        })
+
+        const updatedJob = await Job.getJobById(job_id)
+
+        res.status(200).json({ message: 'Photo added to job successfully', data: updatedJob });
+    } catch (error) {
+        console.log('Error adding photo to job:', error); //!REMOVE
+        res.status(500).json({ message: 'Error adding photo to job', error });
+    }
+}
+
 
 
 
@@ -66,7 +90,6 @@ exports.getUserJobs = async (req, res) => {
     try {
         const user_id = req.headers["user_unx_id"]
 
-        console.log(' Getting user Jobs user_id: ', user_id) //!REMOVE
 
         if(!user_id){
             res.status(400).json({message: 'Error: Invalid User ID!'})
@@ -75,7 +98,6 @@ exports.getUserJobs = async (req, res) => {
 
         const jobs = await Job.getJobByOwnerId(user_id);
 
-        console.log('Jobs: ', jobs) //!REMOVE
 
         res.status(200).json({ message: 'Jobs retrieved successfully', data: jobs })
 

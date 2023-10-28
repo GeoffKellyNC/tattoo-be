@@ -20,5 +20,9 @@ router
     .route('/get-user-jobs')
     .get(jobControllers.getUserJobs)
 
+router
+    .route('/add-photos-to-job')
+    .post(multerUpload.array('photos[]', 10), jobControllers.addPhotosToJob)
+
 
 module.exports = router;

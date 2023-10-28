@@ -46,15 +46,16 @@ class Job {
         }
     }
 
-    async addPhotoToJob(job_id, imageURL) {
+    static async addPhotoToJob(job_id, imageURL) {
         try {
+            console.log('Adding to database: ', job_id)
             const result = await db.collection('active-user-jobs').findOneAndUpdate(
                 { job_id }, 
                 { $push: { job_photos: imageURL } }, 
                 { returnOriginal: false }
             );
             
-            if (!result.value) {
+            if (!result) {
                 console.log('Error: No job found with the provided job_id');
                 return false;
             }
@@ -67,7 +68,7 @@ class Job {
     }
     
 
-    async uploadJobPhoto(unxid, userFile ) {
+    static async uploadJobPhoto(unxid, userFile, jobId ) {
         try {
 
             return new Promise((res, rej) => {
@@ -87,11 +88,11 @@ class Job {
     
                 blobStream.on('finish', async () => {
                     const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
-                    await this.addPhotoToJob(this.job_id, publicUrl);
+                    await this.addPhotoToJob(jobId, publicUrl);
                     res(true);
                 });
     
-                blobStream.end(userFile.file.buffer);
+                blobStream.end(userFile.buffer);
             })
 
         } catch (error) {
