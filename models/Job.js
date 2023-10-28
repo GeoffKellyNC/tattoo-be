@@ -39,7 +39,7 @@ class Job {
     async save(){
         try{
             const job = await db.collection('active-user-jobs').insertOne(this)
-            return job
+            return this
         }catch(err){
             console.log('Error saving job: ', err) //TODO: Handle this error
             return false
