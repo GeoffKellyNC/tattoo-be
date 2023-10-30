@@ -39,7 +39,9 @@ const generateJWT = async (user) => {
         isAdmin: user.isAdmin,
         isMod: user.isMod,
         isClient: user.isClient,
-        isArtist: user.isArtist
+        isArtist: user.isArtist,
+        subscription_active: user.subscription_active,
+        subscription_type: user.subscription_type,
     }
 
     const options = {

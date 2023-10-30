@@ -8,7 +8,7 @@ const sanitizeUserData = (data) => {
           'isAdmin', 'isMod', 'isClient', 'isArtist', 'is_active', 
           'is_deleted', 'date_deleted', 'date_created', 
           'attr1', 'attr2', 'attr3', 'attr4', 'attr5', 
-          'attr6', 'attr7', 'attr8'
+          'attr6', 'attr7', 'attr8', 'subscription_active', 'subscription_type', 'subscription_start_date', 'subscription_end_date'
         ];
   
         propertiesToDelete.forEach(prop => {

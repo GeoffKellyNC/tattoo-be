@@ -28,6 +28,10 @@ class User {
         this.session_token = null
         this.account_status = 'active',
         this.online_status = 'offline'
+        this.subscription_active = false
+        this.subscription_type = null
+        this.subscription_start_date = null
+        this.subscription_end_date = null
     }
     //Registration Checks
     async create_user_checks() {
@@ -74,6 +78,10 @@ class User {
                 session_token: this.session_token,
                 account_status: this.account_status,
                 online_status: this.online_status,
+                subscription_active: this.subscription_active,
+                subscription_type: this.subscription_type,
+                subscription_start_date: this.subscription_start_date,
+                subscription_end_date: this.subscription_end_date,
                 attr1: null,
                 attr2: null,
                 attr3: null,
@@ -433,6 +441,10 @@ class User {
                         attr7: 0,
                         attr8: 0,
                         user_unxid: 0,
+                        subscription_active: 0,
+                        subscription_type: 0,
+                        subscription_start_date: 0,
+                        subscription_end_date: 0
                     }
                 }
             ]).toArray();
@@ -523,7 +535,8 @@ class User {
                         attr6: 0,
                         attr7: 0,
                         attr8: 0,
-                        user_unxid: 0
+                        user_unxid: 0,
+                        
                     }
                 }
             ]).toArray();

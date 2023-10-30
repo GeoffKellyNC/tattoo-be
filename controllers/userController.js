@@ -47,7 +47,7 @@ exports.createUser = async (req, res) => {
 
         await sendVerificationEmail(data.unxid, data.user_email, verificationCode)
         
-        res.status(200).json({message: 'User created successfully'})
+        res.status(200).json({message: 'User created successfully', data: data.unxid})
 
 
 

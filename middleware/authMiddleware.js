@@ -9,7 +9,7 @@ async function authMiddleware(req, res, next) {
             Current time: ${formatedDate}
             req.path: ${req.path}
         `)
-        const excludedPaths = ['login', 'register', 'check-user-name', 'verify-email', 'reset-password-verify','reset-password' ]; 
+        const excludedPaths = ['login', 'register', 'check-user-name', 'verify-email', 'reset-password-verify','reset-password', 'stripe' ]; 
 
 
         if (excludedPaths.some(path => req.path.includes(path))) {

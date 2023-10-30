@@ -42,6 +42,7 @@ connectMongoDB()
 server.use('/auth', require('./routes/auth'))
 server.use('/user', require('./routes/user'))
 server.use('/jobs', require('./routes/jobs'))
+server.use('/stripe', require('./routes/stripe'))
 
 
 
