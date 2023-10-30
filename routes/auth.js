@@ -34,6 +34,11 @@ router
     .route('/reset-password-verify')
     .post(authControllers.sendResetPasswordEmail)
 
+router
+    .route('/decode-token')
+    .get(authControllers.decodeJWTPayload)
+
+
 
 
 

@@ -1,7 +1,6 @@
 const Job = require('../models/Job')
 
 exports.createJob = async (req, res) => {
-    console.log('Req Body:', req.body); //!REMOVE
     try {
         const jobData = req.body;
         const unxid = req.headers["user_unx_id"];
@@ -19,7 +18,6 @@ exports.createJob = async (req, res) => {
         
         res.status(200).json({ message: 'Job created successfully', data: jobSaved });
     } catch (error) {
-        console.log('Error creating job:', error); //!REMOVE
         res.status(500).json({ message: 'Error creating job', error });
     }
 }
@@ -30,7 +28,6 @@ exports.addPhotosToJob = async (req, res) => {
         const unxid = req.headers["user_unx_id"];
         const files = req.files;
 
-        console.log('Number of Photos uploaded: ', files.length) //!REMOVE
 
         await files.forEach(file => {
             console.log('Uploading for Job:', job_id)

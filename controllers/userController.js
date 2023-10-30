@@ -38,8 +38,6 @@ exports.createUser = async (req, res) => {
 
         const data = await user.create_user_in_db()
         await user.setUpDatabaseDefaultsClient(data.unxid)
-        console.log('Client: ', data.isClient) //!REMOVE
-        console.log('Artist: ', data.isArtist) //!REMOVE
         if(data.isArtist){
             console.log('Creating artist defaults') //!REMOVE
             await User.setUpArtistDefaults(data.unxid)

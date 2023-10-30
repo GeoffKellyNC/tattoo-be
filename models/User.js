@@ -85,6 +85,7 @@ class User {
             }
             await db.collection('users').insertOne(newUser)
 
+
             return newUser
         } catch (err) {
             console.log(err) //TODO: Handle this error
@@ -110,6 +111,7 @@ class User {
         try {
             const user = await db.collection('users').findOne({ unxid: unxid })
 
+
             return user.password
         } catch (error) {
             console.log(error) //TODO: Handle this error
@@ -117,9 +119,9 @@ class User {
     }
 
     // Get user data. Core data artists and clients
-    static getUserByUserName = (user_name) => {
+    static getUserByUserName = async (user_name) => {
         try {
-            const user = db.collection('users').findOne({ user_name: user_name }, { projection: { password: 0 } })
+            const user = await db.collection('users').findOne({ user_name: user_name })
 
             if(!user){
                 return false
@@ -137,6 +139,7 @@ class User {
     static getUserByUNXID = async (unxid) => {
         try {
             const user = await db.collection('users').findOne({ unxid: unxid })
+
 
             return user
         } catch (error) {
@@ -429,7 +432,7 @@ class User {
                         attr6: 0,
                         attr7: 0,
                         attr8: 0,
-                        user_unxid: 0
+                        user_unxid: 0,
                     }
                 }
             ]).toArray();

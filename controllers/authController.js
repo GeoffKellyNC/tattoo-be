@@ -1,6 +1,8 @@
 const User = require('../models/User')
 const Auth = require('../models/Auth')
 const sendResetPassEmail = require('../util/resetPasswordMailer')
+const sanitizeUserData = require('../util/sanitizeUserData')
+
 
 exports.login = async (req, res) => {
     try {
@@ -47,13 +49,19 @@ exports.login = async (req, res) => {
         
 
 
-        const {jwtToken, jwtExpire} = await Auth.generateJWT(userData)
+        const jwtToken  = await Auth.generateJWT(userData)
+
+        const decoded_data = await Auth.verifyJWT(jwtToken)
 
         await User.updateUserDataUXID('session_token', jwtToken, userData.unxid)
 
         await User.updateUserDataUXID('online_status', 'online', userData.unxid)
 
-        res.status(200).json({userData, jwtToken, userProfileDetails, userContactDetails, clientUploadedImages})
+        const sanitizedData = await sanitizeUserData(userData)
+
+        console.log('LOGIN SANITIZED DATA: ', sanitizedData) //!REMOVE
+
+        res.status(200).json({userData: sanitizedData, jwtToken, userProfileDetails, userContactDetails, clientUploadedImages, decoded_data})
 
         return
 
@@ -83,12 +91,21 @@ exports.logout = async (req, res) => {
     }
 }
 
-exports.verifyUserAccess = (req, res) => {
+exports.verifyUserAccess = async (req, res) => {
     try {
-        const user = req.user
+        const jwt = req.headers['auth-token']
+        
+        // check to make sure token has not expired, make sure the token is valid
 
-        res.status(200).json(user)
+        const decoded_data = await Auth.verifyJWT(jwt)
 
+        if(!decoded_data){
+            res.status(400).json({message: 'Invalid token'})
+            return
+        }
+
+        res.status(200).json({message: 'Valid token', data: decoded_data})
+        
     } catch (error) {
         console.log('Error verifying user access: ', error) //TODO: Handle this error
         res.status(500).json({message: 'Error verifying user access', error})
@@ -171,7 +188,6 @@ exports.sendResetPasswordEmail = async (req, res) => {
 
         const unxid = await User.getUserIdByEmail(user_email)
 
-        console.log("unxid: ", unxid) //!REMOVE
 
         if(!unxid){
             res.status(401).json({message: "Error resetting password. Code: x459"})
@@ -224,6 +240,20 @@ exports.resetUserPassword = async (req, res) => {
     } catch (error) {
         console.log("Error resetting password: ", error) 
         res.status(500).json({message: "Error resetting password"})
+    }
+}
+
+exports.decodeJWTPayload = async (req, res) => {
+    try {
+        const jwtToken = req.headers['auth-token']
+
+        const decoded_data = await Auth.verifyJWT(jwtToken)
+
+        res.status(200).json({message: 'Decoded Data', data: decoded_data})
+
+    } catch (error) {
+        console.log("Error decoding JWT: ", error) 
+        res.status(500).json({message: "Error decoding JWT"})
     }
 }
 

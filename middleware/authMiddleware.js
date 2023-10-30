@@ -18,31 +18,25 @@ async function authMiddleware(req, res, next) {
 
     
         const jwtToken = req.headers['auth-token'];
-        const user_unxid = req.headers.user_unx_id;
+        const user_unxid = req.headers['user_unx_id']
 
 
     
         // Check if token exists
-        if (!jwtToken) {
+        if (!jwtToken || !user_unxid) {
             return res.status(401).json({ message: 'Access Denied. No token provided.' });
         }
     
         // Verify the token's authenticity
-        const isValid = await Auth.verifyJWT(jwtToken, user_unxid);
-        if (!isValid) {
+        const decoded_data = await Auth.verifyJWT(jwtToken);
+
+        if (!decoded_data) {
             return res.status(401).json({ message: 'Invalid token.' });
         }
-    
-        // Decode the JWT to inspect the expiration claim
-        const decodedPayload = jwt.decode(jwtToken);
-    
-        // Check if token has expired
-        const currentTimestamp = Math.floor(Date.now() / 1000); // Current time in seconds since the epoch
-        if (decodedPayload.exp && decodedPayload.exp < currentTimestamp) {
-            return res.status(401).json({ message: 'Token has expired. Please log in again.' });
+
+        if (decoded_data.user_unxid !== user_unxid) {
+            return res.status(401).json({ message: 'Invalid token.' });
         }
-    
-        req.user = decodedPayload;
     
         next();
     } catch (error) {

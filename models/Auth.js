@@ -35,7 +35,11 @@ const generateJWT = async (user) => {
     const secret = process.env.JWT_SECRET
 
     const payload = {
-        user_unxid: user.unxid
+        user_unxid: user.unxid,
+        isAdmin: user.isAdmin,
+        isMod: user.isMod,
+        isClient: user.isClient,
+        isArtist: user.isArtist
     }
 
     const options = {
@@ -44,33 +48,19 @@ const generateJWT = async (user) => {
 
     const jwtToken = jwt.sign(payload, secret, options)
 
-    const jwtExpire = jwt.decode(jwtToken).exp * 1000
-
-    return { jwtToken, jwtExpire }
-
-
+    return jwtToken
 
 }
 
-const verifyJWT = async (token, user_unxid) => {
+const verifyJWT = async (token) => {
     try {
-        const secret = process.env.JWT_SECRET
-    
-        const decoded =  jwt.verify(token, secret)
-    
-    
-        if (decoded.user_unxid != user_unxid) {
-            console.log('JWT token does not match user unxid') //TODO: Handle this error (LOG)
-            return false
-        }
-    
-        return true;
+        const secret = process.env.JWT_SECRET;
+        const decoded = jwt.verify(token, secret);
+        return decoded;
     } catch (error) {
-        console.log('Error verifying JWT: ', error) //TODO: Handle this error
+        console.log('Error verifying JWT: ', error); //TODO: Handle this error
+        return null;
     }
-
-    
-    
 }
 
 const verifyResetToken = async (unxid, resetCode) => {
