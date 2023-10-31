@@ -26,7 +26,7 @@ exports.stripeWebhook = async (req, res) => {
             }
         }
 
-        let subscription;
+        let subscription; 
         let status;
 
         console.log("EVENT RECEIVED: ", event.type) //!REMOVE
@@ -157,7 +157,7 @@ exports.createPortalSession = async (req, res) => {
         const unxid = req.headers['user_unx_id']
 
         const session_id = await User.getStripeSessionId(unxid)
-        
+
         const checkoutSession = await stripe.checkout.sessions.retrieve(session_id);
       
         const returnUrl = DOMAIN;
