@@ -82,8 +82,8 @@ class User {
                 subscription_type: this.subscription_type,
                 subscription_start_date: this.subscription_start_date,
                 subscription_end_date: this.subscription_end_date,
-                attr1: null,
-                attr2: null,
+                attr1: null, // Stripe Client ID
+                attr2: null, // Stripe Session ID
                 attr3: null,
                 attr4: null,
                 attr5: null,
@@ -623,6 +623,38 @@ class User {
         try {
             await db.collection('users').updateOne({ unxid: unxid }, { $set: { user_email: email } })
             return email
+        } catch (error) {
+            console.log(error) //TODO: Handle this error
+            return false
+        }
+    }
+
+    static async setStripeCustomerID(unxid, customer_id) {
+        try {
+            await db.collection('users').updateOne({ unxid: unxid }, { $set: { attr1: customer_id } })
+            return true
+        }
+        catch (error) {
+            console.log(error) //TODO: Handle this error
+            return false
+        }
+    }
+
+    static async setStripeSessionID(unxid, session_id) {
+        try {
+            await db.collection('users').updateOne({ unxid: unxid }, { $set: { attr2: session_id } })
+            return true
+        }
+        catch (error) {
+            console.log(error) //TODO: Handle this error
+            return false
+        }
+    }
+
+    static async updateUserSubscription(customer_id, subscription_type, status) {
+        try {
+            await db.collection('users').updateOne({attr1 : customer_id }, { $set: { subscription_type: subscription_type, subscription_active: status } })
+            return true
         } catch (error) {
             console.log(error) //TODO: Handle this error
             return false

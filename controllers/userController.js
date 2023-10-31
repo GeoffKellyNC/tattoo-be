@@ -54,6 +54,7 @@ exports.createUser = async (req, res) => {
 
     } catch (error) {
         console.log('Error creating user: ', error) //TODO: Handle this error
+        res.status(500).json({message: 'Error creating user', data: error})
     }
 }
 

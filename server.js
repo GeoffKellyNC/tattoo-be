@@ -16,8 +16,14 @@ if (process.env.ENV_TYPE === 'production'){
     console.log("RUNNING DEVELOPMENT")
 }
 
+const excludeWebhookJsonMiddleware = (req, res, next) => {
+    if (req.path.includes("webhook")) {
+      next();
+    } else {
+      express.json()(req, res, next);
+    }
+  };
 
-server.use(express.json())
 
 if(process.env.LOCAL_MODE) {
     server.use(cors({
@@ -36,6 +42,7 @@ if(process.env.LOCAL_MODE) {
 server.use(cookieParser());
 
 server.use(authMiddleware)
+server.use(excludeWebhookJsonMiddleware)
 
 connectMongoDB()
 

@@ -9,5 +9,9 @@ router
     .post(stripeContoller.createCheckoutSession)
 
 
+router
+    .route('/webhook')
+    .post(express.raw({type: 'application/json'}), stripeContoller.stripeWebhook)
+
 
 module.exports = router;
