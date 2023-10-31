@@ -1,7 +1,7 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const User = require('../models/User');
 
-const DOMAIN = process.env.DOMAIN;
+const DOMAIN = 'https://stripe-init--linkd-dev.netlify.app/'
 
 
 
@@ -66,7 +66,7 @@ exports.stripeWebhook = async (req, res) => {
                 }
                 await User.updateUserSubscription(subscription.customer, 'monthly', true)
                 break;
-                
+
             case 'customer.subscription.paused':
                 console.log('subscription paused') //!REMOVE
                 console.log('subscription: ', subscription) //!REMOVE
