@@ -125,6 +125,8 @@ exports.createCheckoutSession = async (req, res) => {
             automatic_tax: { enabled: true },
             metadata: {unxid}
           });
+
+        await User.setStripeSessionId(unxid, session.id)
         
         res.status(200).json({message: 'Success', data: session.url})
 
@@ -134,3 +136,39 @@ exports.createCheckoutSession = async (req, res) => {
         res.status(500).json({message: 'Error creating checkout session', data: error})
     }
 }
+
+
+exports.setStripeSessionId = async (req, res) => {
+    try {
+        const unxid = req.headers['user_unx_id']
+        const sessionId = req.body.session_id
+
+        await User.setStripeSessionId(unxid, sessionId)
+
+        res.status(200).json({message: 'Success'})
+    } catch (error) {
+        console.log('Error setting stripe session id: ', error) //TODO: Handle this error
+        res.status(500).json({message: 'Error setting stripe session id', data: error})
+    }
+}
+
+exports.createPortalSession = async (req, res) => {
+    try {
+        const unxid = req.headers['user_unx_id']
+
+        const session_id = await User.getStripeSessionId(unxid)
+        
+        const checkoutSession = await stripe.checkout.sessions.retrieve(session_id);
+      
+        const returnUrl = DOMAIN;
+      
+        const portalSession = await stripe.billingPortal.sessions.create({
+          customer: checkoutSession.customer,
+          return_url: returnUrl,
+        });
+      
+        res.redirect(303, portalSession.url);
+    } catch (error) {
+        res.status(500).json({message: 'Error creating portal session', data: error})
+    }
+  };

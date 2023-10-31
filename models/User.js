@@ -640,10 +640,21 @@ class User {
         }
     }
 
-    static async setStripeSessionID(unxid, session_id) {
+    static async setStripeSessionId(unxid, session_id) {
         try {
             await db.collection('users').updateOne({ unxid: unxid }, { $set: { attr2: session_id } })
             return true
+        }
+        catch (error) {
+            console.log(error) //TODO: Handle this error
+            return false
+        }
+    }
+
+    static async getStripeSessionId(unxid) {
+        try {
+            const user = await db.collection('users').findOne({ unxid: unxid })
+            return user.attr2
         }
         catch (error) {
             console.log(error) //TODO: Handle this error

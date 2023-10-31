@@ -13,6 +13,14 @@ router
     .route('/webhook')
     .post(express.raw({type: 'application/json'}), stripeContoller.stripeWebhook)
 
+router
+    .route('/set-stripe-session')
+    .post(stripeContoller.setStripeSessionId)
+
+router
+    .route('/create-portal-session')
+    .post(stripeContoller.createPortalSession)
+
 
 module.exports = router;
 
