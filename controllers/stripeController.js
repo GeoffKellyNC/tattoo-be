@@ -29,13 +29,15 @@ exports.stripeWebhook = async (req, res) => {
         let subscription;
         let status;
 
+        console.log("EVENT RECEIVED: ", event.type) //!REMOVE
+
         switch(event.type){
             case 'checkout.session.completed':
                 const session = event.data.object;
                 const metadata = session.metadata;
                 const unxid = metadata.unxid;
                 const customerId = session.customer;
-                await User.updateUserStripeCustomerId(unxid, customerId)
+                await User.setStripeCustomerID(unxid, customerId)
                 console.log('unxid: ', unxid) //!REMOVE
                 console.log('session: ', session) //!REMOVE
                 console.log('metadata: ', metadata) //!REMOVE
