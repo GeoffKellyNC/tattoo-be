@@ -167,7 +167,7 @@ exports.createPortalSession = async (req, res) => {
           return_url: returnUrl,
         });
       
-        res.redirect(303, portalSession.url);
+        res.status(200).json({data: portalSession.url})
     } catch (error) {
         res.status(500).json({message: 'Error creating portal session', data: error})
     }

@@ -11,12 +11,17 @@ exports.login = async (req, res) => {
 
         const userData = await User.getUserByUserName(data.user_name)
 
+        console.log('User Data: ', userData) //!REMOVE
+
         const storedPassword = await User.getUserPassword(userData.unxid)
             
         if(!userData || !storedPassword){
             res.status(400).json({message: 'User not found'})
             return
         }
+
+        console.log('Data Pass: ', data.password) //!REMOVE
+        console.log('Stored Pass: ', storedPassword) //!REMOVE
 
         const passwordVerified = await Auth.comparePassHash(data.password, storedPassword)
 

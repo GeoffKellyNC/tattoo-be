@@ -117,6 +117,7 @@ class User {
 
     static getUserPassword = async (unxid) => {
         try {
+            console.log('Getting User Pass: ', unxid) //!REMOVE
             const user = await db.collection('users').findOne({ unxid: unxid })
 
 
