@@ -1,7 +1,7 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const User = require('../models/User');
 
-const DOMAIN = 'https://stripe-init--linkd-dev.netlify.app/'
+const DOMAIN = process.env.DOMAIN;
 
 
 

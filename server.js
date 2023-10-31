@@ -32,7 +32,7 @@ if(process.env.LOCAL_MODE) {
     }));
 } else {
     server.use(cors({
-        origin: 'https://stripe-init--linkd-dev.netlify.app',
+        origin: 'https://linkd-dev.netlify.app',
         credentials: true,
     }));
 }
