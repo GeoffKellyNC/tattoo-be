@@ -13,9 +13,9 @@ class User {
         this.unxid = uuid()
         this.first_name = data.first_name
         this.last_name = data.last_name
-        this.user_name = data.user_name
+        this.user_name = data.user_name.toLowerCase()
         this.display_name = data.display_name
-        this.user_email = data.email
+        this.user_email = data.email.toLowerCase()
         this.user_email_verified = false
         this.password = data.password,
         this.googleId = data.googleId,
@@ -115,6 +115,22 @@ class User {
         }
     }
 
+    static checkIfEmailExists = async (email) => {
+        try {
+            const userExists = await db.collection('users').findOne({ user_email: email })
+
+            if (userExists) {
+                console.log('Email Exists') //!REMOVE
+                return true
+            } else {
+                console.log('Email Does Not Exist') //!REMOVE
+                return false
+            }
+        } catch (error) {
+            console.log(error) //TODO: Handle this error
+        }
+    }
+
     static getUserPassword = async (unxid) => {
         try {
             console.log('Getting User Pass: ', unxid) //!REMOVE
@@ -131,6 +147,21 @@ class User {
     static getUserByUserName = async (user_name) => {
         try {
             const user = await db.collection('users').findOne({ user_name: user_name })
+
+            if(!user){
+                return false
+            }
+
+            return user
+        } catch (error) {
+            console.log(error) //TODO: Handle this error
+            return false
+        }
+    }
+
+    static async getUserByEmail(email) {
+        try {
+            const user = await db.collection('users').findOne({ user_email: email })
 
             if(!user){
                 return false

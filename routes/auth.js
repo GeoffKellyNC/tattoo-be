@@ -39,6 +39,10 @@ router
     .get(authControllers.decodeJWTPayload)
 
 
+router
+    .route('/check-email')
+    .post(authControllers.checkIfEmailExists)
+
 
 
 

@@ -8,10 +8,9 @@ exports.login = async (req, res) => {
     try {
         const data = req.body
 
+        const email = data.email.toLowerCase()
 
-        const userData = await User.getUserByUserName(data.user_name)
-
-        console.log('User Data: ', userData) //!REMOVE
+        const userData = await User.getUserByEmail(email)
 
         const storedPassword = await User.getUserPassword(userData.unxid)
             
@@ -19,9 +18,6 @@ exports.login = async (req, res) => {
             res.status(400).json({message: 'User not found'})
             return
         }
-
-        console.log('Data Pass: ', data.password) //!REMOVE
-        console.log('Stored Pass: ', storedPassword) //!REMOVE
 
         const passwordVerified = await Auth.comparePassHash(data.password, storedPassword)
 
@@ -259,6 +255,30 @@ exports.decodeJWTPayload = async (req, res) => {
     } catch (error) {
         console.log("Error decoding JWT: ", error) 
         res.status(500).json({message: "Error decoding JWT"})
+    }
+}
+
+
+exports.checkIfEmailExists = async (req, res) => {
+    try {
+        const email = req.body.email.toLowerCase()
+
+        console.log('Checking Email Exists: ', email) //!REMOVE
+
+        const user = await User.checkIfEmailExists(email)
+
+        console.log('Checking Email Exists RETURN: ', user) //!REMOVE
+
+        if(!user){
+            res.status(200).json({message: 'Email does not exist', data: false})
+            return
+        }
+
+        res.status(200).json({message: 'Email already exists', data: true})
+
+    } catch (error) {
+        console.log("Error checking if email exists: ", error) 
+        res.status(500).json({message: "Error checking if email exists"})
     }
 }
 
