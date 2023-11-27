@@ -105,3 +105,50 @@ exports.getUserJobs = async (req, res) => {
     }
 }
 
+
+exports.createJobBid = async (req, res) => {
+    try {
+
+        const { jobId, artistId, data, jobOwnerId } = req.body;
+
+        const newBid = await Job.createJobBid(jobId, artistId, data, jobOwnerId);
+
+        if(!newBid){
+            res.status(400).json({message: 'Error creating job bid'})
+            return
+        }
+
+        res.status(200).json({ message: 'Job bid created successfully', data: newBid })
+        
+    } catch (error) {
+        console.log('Error creating job bid: ', error) //TODO: Handle this error
+        res.status(500).json({ message: 'Error creating job bid', error })
+        return
+    }
+}
+
+exports.getJobBidsForOwner = async (req, res) => {
+    try {
+        const user_id = req.headers["user_unx_id"]
+
+        if(!user_id){
+            res.status(400).json({message: 'Error: Invalid User ID!'})
+            return
+        }
+
+        const jobBids = await Job.getJobBidByOwnerId(user_id);
+
+        if(!jobBids){
+            res.status(400).json({message: 'Error retrieving job bids'})
+            return
+        }
+
+        res.status(200).json({ message: 'Job bids retrieved successfully', data: jobBids })
+        
+    } catch (error) {
+        console.log('Error retrieving job bids: ', error) //TODO: Handle this error
+        res.status(500).json({ message: 'Error retrieving job bids', error })
+        return
+    }
+}
+

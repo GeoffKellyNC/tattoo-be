@@ -189,6 +189,49 @@ class Job {
             return false
         }
     }
+
+    static async createJobBid(jobId, artistId, data, creatorId) {
+        try {
+            const newBidObj = {
+                job_id: jobId,
+                artist_id: artistId,
+                job_owner_id: creatorId,
+                proposed_price: data.proposedPrice || null,
+                proposed_date: data.propsedDate || null,
+                artist_comments: data.comments || null,
+                timestamp: new Date(),
+                is_active: true,
+                is_deleted: false,
+                attr1: null,
+                attr2: null,
+                attr3: null,
+                attr4: null,
+                attr5: null,
+                attr6: null,
+                attr7: null,
+                attr8: null
+            }
+
+            const result = await db.collection('active-job-bids').insertOne(newBidObj)
+
+            return result
+
+
+        } catch (error) {
+            console.log('Error Creating Job Bid: ', error) //!TODO: Handle This Error (LOG)
+            return false
+        }
+    }
+
+    static async getJobBidByOwnerId(owner_id){
+        try{
+            const jobs = await db.collection('active-job-bids').find({job_owner_id: owner_id}).toArray()
+            return jobs
+        }catch(err){
+            console.log('Error getting jobs by owner id: ', err) //TODO: Handle this error
+            return false
+        }
+    }
 }
 
 module.exports = Job
