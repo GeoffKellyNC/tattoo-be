@@ -62,7 +62,7 @@ exports.login = async (req, res) => {
 
         console.log('LOGIN SANITIZED DATA: ', sanitizedData) //!REMOVE
 
-        res.status(200).json({userData: sanitizedData, jwtToken, userProfileDetails, userContactDetails, clientUploadedImages, decoded_data})
+        res.status(200).json({userData: sanitizedData, jwtToken, userProfileDetails, userContactDetails, clientUploadedImages, decoded_data, artistDetials: artistDetials ? artistDetials : null})
 
         return
 

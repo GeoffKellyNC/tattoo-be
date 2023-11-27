@@ -627,7 +627,13 @@ class User {
                 awards: [],
                 payment_methods: [],
                 artist_mediums: [],
-                artist_equipment: []
+                artist_equipment: [],
+                attr1: null,
+                attr2: null,
+                attr3: null,
+                attr4: null,
+                attr5: null,
+                attr6: null
 
             }
 

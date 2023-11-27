@@ -11,7 +11,8 @@ const db = mongo.db(process.env.MONGO_DB_NAME)
 class Job {
     constructor(data, unxid){
         this.job_id = uuid();               
-        this.owner_id = unxid;            
+        this.owner_id = unxid;    
+        this.owner_user_name = data.owner_user_name;        
         this.job_created_date = new Date();             
         this.job_title = data.job_title;                
         this.job_desc = data.job_desc;                  
