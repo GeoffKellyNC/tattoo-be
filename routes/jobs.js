@@ -25,8 +25,12 @@ router
     .post(multerUpload.array('photos[]', 10), jobControllers.addPhotosToJob)
 
 router
-    .route('/get-job-bids')
+    .route('/get-job-bids-client')
     .get(jobControllers.getJobBidsForOwner)
+
+router
+    .route('get-job-bids-artist')
+    .get(jobControllers.getJobBidsForArtist)
 
 router
     .route('/create-job-bid')

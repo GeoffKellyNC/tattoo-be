@@ -152,3 +152,28 @@ exports.getJobBidsForOwner = async (req, res) => {
     }
 }
 
+exports.getJobBidsForArtist = async (req, res) => {
+    try {
+        const user_id = req.headers["user_unx_id"]
+
+        if(!user_id){
+            res.status(400).json({message: 'Error: Invalid User ID!'})
+            return
+        }
+
+        const jobBids = await Job.getJobBidsByArtistId(user_id);
+
+        if(!jobBids){
+            res.status(400).json({message: 'Error retrieving job bids'})
+            return
+        }
+
+        res.status(200).json({ message: 'Job bids retrieved successfully', data: jobBids })
+        
+    } catch (error) {
+        console.log('Error retrieving job bids: ', error) //TODO: Handle this error
+        res.status(500).json({ message: 'Error retrieving job bids', error })
+        return
+    }
+}
+

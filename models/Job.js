@@ -232,6 +232,16 @@ class Job {
             return false
         }
     }
+
+    static async getJobBidsByArtistId(artist_id){
+        try{
+            const jobs = await db.collection('active-job-bids').find({artist_id: artist_id}).toArray()
+            return jobs
+        }catch(err){
+            console.log('Error getting jobs by artist id: ', err) //TODO: Handle this error
+            return false
+        }
+    }
 }
 
 module.exports = Job
