@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const userControllers = require('../controllers/userController')
+const locationControllers = require('../controllers/locationController')
 const multerUpload = require('../middleware/uploadMiddleware');
 
 
@@ -46,6 +47,11 @@ router
 router
     .route('/update-verificatoin-email')
     .post(userControllers.updateUserEmailForVerification);
+
+
+router
+    .route('/location-data')
+    .post(locationControllers.getUserLocationData)
 
 
     
