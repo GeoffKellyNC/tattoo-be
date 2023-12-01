@@ -24,6 +24,7 @@ const excludeWebhookJsonMiddleware = (req, res, next) => {
     }
   };
 
+  const allowedCorsOrigins = ['https://dev.getlinkd.ink', 'https://linkd-dev.netlify.app']
 
 if(process.env.LOCAL_MODE) {
     server.use(cors({
@@ -32,7 +33,7 @@ if(process.env.LOCAL_MODE) {
     }));
 } else {
     server.use(cors({
-        origin: 'https://linkd-dev.netlify.app',
+        origin: allowedCorsOrigins,
         credentials: true,
     }));
 }
