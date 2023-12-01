@@ -29,12 +29,16 @@ router
     .get(jobControllers.getJobBidsForOwner)
 
 router
-    .route('get-job-bids-artist')
+    .route('/get-job-bids-artist')
     .get(jobControllers.getJobBidsForArtist)
 
 router
     .route('/create-job-bid')
     .post(jobControllers.createJobBid)
+
+router
+    .route('/get-job-by-id/:jobId')
+    .get(jobControllers.getJobById)
 
 
 module.exports = router;

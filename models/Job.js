@@ -196,9 +196,9 @@ class Job {
                 job_id: jobId,
                 artist_id: artistId,
                 job_owner_id: creatorId,
-                proposed_price: data.proposedPrice || null,
-                proposed_date: data.propsedDate || null,
-                artist_comments: data.comments || null,
+                proposed_price: data.bidAmount || null,
+                proposed_date: null,
+                artist_comments: data.artistDetails || null,
                 timestamp: new Date(),
                 is_active: true,
                 is_deleted: false,
@@ -212,9 +212,12 @@ class Job {
                 attr8: null
             }
 
-            const result = await db.collection('active-job-bids').insertOne(newBidObj)
+            const result = await db.collection('active-job-bids').insertOne(newBidObj);
+            if (result.acknowledged) {
+                return await db.collection('active-job-bids').findOne({ _id: result.insertedId });
+            }
 
-            return result
+            return false
 
 
         } catch (error) {

@@ -1,4 +1,5 @@
 const Job = require('../models/Job')
+const sanitizeBidData = require('../util/sanitizeBidData');
 
 exports.createJob = async (req, res) => {
     try {
@@ -138,12 +139,14 @@ exports.getJobBidsForOwner = async (req, res) => {
 
         const jobBids = await Job.getJobBidByOwnerId(user_id);
 
+        const sanitizedData = await sanitizeBidData(jobBids)
+
         if(!jobBids){
             res.status(400).json({message: 'Error retrieving job bids'})
             return
         }
 
-        res.status(200).json({ message: 'Job bids retrieved successfully', data: jobBids })
+        res.status(200).json({ message: 'Job bids retrieved successfully', data: sanitizedData })
         
     } catch (error) {
         console.log('Error retrieving job bids: ', error) //TODO: Handle this error
@@ -168,12 +171,38 @@ exports.getJobBidsForArtist = async (req, res) => {
             return
         }
 
-        res.status(200).json({ message: 'Job bids retrieved successfully', data: jobBids })
+       const sanitizedData =  await sanitizeBidData(jobBids)
+
+        res.status(200).json({ message: 'Job bids retrieved successfully', data: sanitizedData })
         
     } catch (error) {
         console.log('Error retrieving job bids: ', error) //TODO: Handle this error
         res.status(500).json({ message: 'Error retrieving job bids', error })
         return
+    }
+}
+
+exports.getJobById = async (req, res) => {
+    try {
+        const jobId = req.params.jobId
+
+        if(!jobId){
+            res.status(400).json({message: 'Error: Invalid Job ID!'})
+            return
+        }
+
+        const job = await Job.getJobById(jobId);
+
+        if(!job){
+            res.status(400).json({message: 'Error retrieving job'})
+            return
+        }
+
+        res.status(200).json({ message: 'Job retrieved successfully', data: job })
+        
+    } catch (error) {
+        console.log('Error retrieving job: ', error) //TODO: Handle this error
+        res.status(500).json({ message: 'Error retrieving job', error })
     }
 }
 
