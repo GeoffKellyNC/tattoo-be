@@ -120,10 +120,8 @@ class User {
             const userExists = await db.collection('users').findOne({ user_email: email })
 
             if (userExists) {
-                console.log('Email Exists') //!REMOVE
                 return true
             } else {
-                console.log('Email Does Not Exist') //!REMOVE
                 return false
             }
         } catch (error) {

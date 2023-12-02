@@ -41,7 +41,7 @@ exports.addPhotosToJob = async (req, res) => {
 
         res.status(200).json({ message: 'Photo added to job successfully', data: updatedJob });
     } catch (error) {
-        console.log('Error adding photo to job:', error); //!REMOVE
+        console.log('Error adding photo to job:', error); //TODO: Handle this error
         res.status(500).json({ message: 'Error adding photo to job', error });
     }
 }
@@ -140,7 +140,6 @@ exports.getJobBidsForOwner = async (req, res) => {
         const jobBids = await Job.getJobBidByOwnerId(user_id);
 
 
-        console.log('Sanitized Data: ', jobBids) //!REMOVE
 
         if(!jobBids){
             res.status(400).json({message: 'Error retrieving job bids'})

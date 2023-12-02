@@ -29,7 +29,6 @@ exports.stripeWebhook = async (req, res) => {
         let subscription; 
         let status;
 
-        console.log("EVENT RECEIVED: ", event.type) //!REMOVE
 
         switch(event.type){
             case 'checkout.session.completed':
@@ -38,10 +37,7 @@ exports.stripeWebhook = async (req, res) => {
                 const unxid = metadata.unxid;
                 const customerId = session.customer;
                 await User.setStripeCustomerID(unxid, customerId)
-                console.log('unxid: ', unxid) //!REMOVE
-                console.log('session: ', session) //!REMOVE
-                console.log('metadata: ', metadata) //!REMOVE
-                console.log('customerId: ', customerId) //!REMOVE
+
                 break;
 
             case 'customer.subscription.deleted':
@@ -51,15 +47,12 @@ exports.stripeWebhook = async (req, res) => {
                 break;
 
             case 'customer.subscription.created':
-                console.log('subscription created') //!REMOVE
                 subscription = event.data.object;
                 status = subscription.status;
-                console.log(`Subscription status is ${status}.`); //!REMOVE
                 await User.updateUserSubscription(subscription.customer, 'monthly', true)
                 break;
 
             case 'customer.subscription.updated':
-                console.log('subscription updated') //!REMOVE
                 subscription = event.data.object;
                 status = subscription.status;
                 if(status !== 'active'){
@@ -70,15 +63,12 @@ exports.stripeWebhook = async (req, res) => {
                 break;
 
             case 'customer.subscription.paused':
-                console.log('subscription paused') //!REMOVE
-                console.log('subscription: ', subscription) //!REMOVE
                 subscription = event.data.object;
                 status = subscription.status;
                 await User.updateUserSubscription(subscription.customer, 'monthly', false)
                 break;
 
             case 'customer.subscription.resumed':
-                console.log('subscription resumed') //!REMOVE
                 subscription = event.data.object;
                 status = subscription.status;
                 await User.updateUserSubscription(subscription.customer, 'monthly', true)
@@ -105,9 +95,6 @@ exports.createCheckoutSession = async (req, res) => {
             expand: ['data.product'],
           });
 
-          console.log('lookup key: ', req.body.lookup_key) //!REMOVE
-          console.log('prices: ', prices) //!REMOVE
-          console.log('unxid: ', unxid) //!REMOVE
 
           const session = await stripe.checkout.sessions.create({
             billing_address_collection: 'auto',

@@ -60,7 +60,6 @@ exports.login = async (req, res) => {
 
         const sanitizedData = await sanitizeUserData(userData)
 
-        console.log('LOGIN SANITIZED DATA: ', sanitizedData) //!REMOVE
 
         res.status(200).json({userData: sanitizedData, jwtToken, userProfileDetails, userContactDetails, clientUploadedImages, decoded_data, artistDetials: artistDetials ? artistDetials : null})
 
@@ -263,11 +262,9 @@ exports.checkIfEmailExists = async (req, res) => {
     try {
         const email = req.body.email.toLowerCase()
 
-        console.log('Checking Email Exists: ', email) //!REMOVE
 
         const user = await User.checkIfEmailExists(email)
 
-        console.log('Checking Email Exists RETURN: ', user) //!REMOVE
 
         if(!user){
             res.status(200).json({message: 'Email does not exist', data: false})

@@ -16,8 +16,6 @@ const convertUserLocationData = async (lat, lng) => {
        const city = addressComponent.find(component => component.types.includes('locality'))
        const state = addressComponent.find(component => component.types.includes('administrative_area_level_1'))
 
-        console.log('CITY: ', city.long_name)//!REMOVE
-        console.log('STATE: ', state.long_name) //!REMOVE
 
         const finalData = { city: city.long_name, state: state.long_name}
 
