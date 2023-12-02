@@ -39,8 +39,37 @@ class Job {
 
     async save(){
         try{
-            const job = await db.collection('active-user-jobs').insertOne(this)
-            return this
+            const finalJobObj = {
+                job_id: this.job_id,
+                owner_id: this.owner_id,
+                owner_user_name: this.owner_user_name,
+                job_created_date: this.job_created_date,
+                job_title: this.job_title,
+                job_desc: this.job_desc,
+                job_photos: this.job_photos,
+                job_characteristics: this.job_characteristics,
+                job_location: this.job_location,
+                job_zipcode: this.job_zipcode,
+                job_budget: this.job_budget,
+                artist_preference: this.artist_preference,
+                job_status: this.job_status,
+                selected_artist_id: this.selected_artist_id,
+                job_expiry_date: this.job_expiry_date,
+                job_reviews: this.job_reviews,
+                is_active: this.is_active,
+                is_deleted: this.is_deleted,
+                date_deleted: this.date_deleted,
+                attr1: null,
+                attr2: null,
+                attr3: null,
+                attr4: null,
+                attr5: null,
+                attr6: null,
+                attr7: null,
+                attr8: null
+            }
+            await db.collection('active-user-jobs').insertOne(finalJobObj)
+            return finalJobObj
         }catch(err){
             console.log('Error saving job: ', err) //TODO: Handle this error
             return false

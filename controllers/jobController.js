@@ -139,14 +139,15 @@ exports.getJobBidsForOwner = async (req, res) => {
 
         const jobBids = await Job.getJobBidByOwnerId(user_id);
 
-        const sanitizedData = await sanitizeBidData(jobBids)
+
+        console.log('Sanitized Data: ', jobBids) //!REMOVE
 
         if(!jobBids){
             res.status(400).json({message: 'Error retrieving job bids'})
             return
         }
 
-        res.status(200).json({ message: 'Job bids retrieved successfully', data: sanitizedData })
+        res.status(200).json({ message: 'Job bids retrieved successfully', data: jobBids })
         
     } catch (error) {
         console.log('Error retrieving job bids: ', error) //TODO: Handle this error
@@ -171,9 +172,9 @@ exports.getJobBidsForArtist = async (req, res) => {
             return
         }
 
-       const sanitizedData =  await sanitizeBidData(jobBids)
+    //    const sanitizedData =  await sanitizeBidData(jobBids)
 
-        res.status(200).json({ message: 'Job bids retrieved successfully', data: sanitizedData })
+        res.status(200).json({ message: 'Job bids retrieved successfully', data: jobBids })
         
     } catch (error) {
         console.log('Error retrieving job bids: ', error) //TODO: Handle this error

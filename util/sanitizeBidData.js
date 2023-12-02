@@ -21,7 +21,7 @@ const sanitizeBidData = dataArray => {
                 sanitizedData.push(newData)
             })
 
-
+            
             res(sanitizedData)
             return
 
