@@ -206,3 +206,30 @@ exports.getJobById = async (req, res) => {
     }
 }
 
+exports.getArtistDetailsForBid = async (req, res) => {
+    try {
+        console.log('Getting artist details for bid') //!REMOVE
+        const artistId = req.params.artistId
+
+        if(!artistId){
+            res.status(400).json({message: 'Error: Invalid Artist ID!'})
+            return
+        }
+
+        const artistData = await Job.getArtistDetailsForBid(artistId);
+
+        if(!artistData){
+            res.status(400).json({message: 'Error retrieving artist data'})
+            return
+        }
+
+        console.log('Artist Data: ', artistData)//!REMOVE
+
+        res.status(200).json({ message: 'Artist data retrieved successfully', data: artistData })
+        
+    } catch (error) {
+        console.log('Error retrieving artist data: ', error) //TODO: Handle this error
+        res.status(500).json({ message: 'Error retrieving artist data', error })
+    }
+}
+

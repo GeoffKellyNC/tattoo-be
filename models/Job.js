@@ -257,7 +257,7 @@ class Job {
 
     static async getJobBidByOwnerId(owner_id){
         try{
-            const jobs = await db.collection('active-job-bids').find({job_owner_id: owner_id}).toArray()
+            const jobs = await db.collection('active-job-bids').find({job_owner_id: owner_id, is_active: true, is_deleted: false}).toArray()
             return jobs
         }catch(err){
             console.log('Error getting jobs by owner id: ', err) //TODO: Handle this error
@@ -267,10 +267,94 @@ class Job {
 
     static async getJobBidsByArtistId(artist_id){
         try{
-            const jobs = await db.collection('active-job-bids').find({artist_id: artist_id}).toArray()
+            const jobs = await db.collection('active-job-bids').find({artist_id: artist_id, is_active: true, is_deleted: false}).toArray()
             return jobs
         }catch(err){
             console.log('Error getting jobs by artist id: ', err) //TODO: Handle this error
+            return false
+        }
+    }
+
+    static async getArtistDetailsForBid(artistId) {
+        try {
+
+            const data = await db.collection('user-artists-data').aggregate([
+                {
+                    $match: {
+                        user_unxid: artistId
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "user_unxid",
+                        foreignField: "unxid",
+                        as: "user"
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "client-profile-image",
+                        let: { user_unxid: "$user_unxid" },
+                        pipeline: [
+                            {
+                                $match: {
+                                    $expr: {
+                                        $and: [
+                                            { $eq: ["$user_unxid", "$$user_unxid"] },
+                                            { $eq: ["$is_active", true] }
+                                        ]
+                                    }
+                                }
+                            }
+                        ],
+                        as: "profileImage"
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "client-contact-info",
+                        localField: "user_unxid",
+                        foreignField: "user_unxid",
+                        as: "contactInfo"
+                    }
+                },
+                { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+                { $unwind: { path: "$profileImage", preserveNullAndEmptyArrays: true } },
+                { $unwind: { path: "$userDetails", preserveNullAndEmptyArrays: true } },
+                { $unwind: { path: "$contactInfo", preserveNullAndEmptyArrays: true } },
+                {
+                    $project: {
+                        "user.password": 0,
+                        "user.user_email": 0,
+                        "user.session_token": 0,
+                        "user.account_status": 0,
+                        "user_isMod": 0,
+                        "user.isAdmin": 0,
+                        attr1: 0,
+                        attr2: 0,
+                        attr3: 0,
+                        attr4: 0,
+                        attr5: 0,
+                        attr6: 0,
+                        attr7: 0,
+                        attr8: 0,
+                        user_unxid: 0,
+                        "user.subscription_active": 0,
+                        "user.subscription_type": 0,
+                        "user.subscription_start_date": 0,
+                        "user.subscription_end_date": 0
+                    }
+                }
+            ]).toArray();
+
+            const artist = data[0];
+
+            return artist;
+
+            
+        } catch (error) {
+            console.log('Error Getting Artist Details For Bid: ', error)
             return false
         }
     }

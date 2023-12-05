@@ -40,5 +40,9 @@ router
     .route('/get-job-by-id/:jobId')
     .get(jobControllers.getJobById)
 
+router
+    .route('/get-artist-details-bid/:artistId')
+    .get(jobControllers.getArtistDetailsForBid)
+
 
 module.exports = router;
