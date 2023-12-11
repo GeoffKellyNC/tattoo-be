@@ -111,7 +111,7 @@ exports.getUserJobs = async (req, res) => {
 exports.createJobBid = async (req, res) => {
     try {
 
-        const { jobId, artistId, data, jobOwnerId } = req.body;
+        const { jobId, artistId, data, jobOwnerId, jobTitle } = req.body;
 
         const newBid = await Job.createJobBid(jobId, artistId, data, jobOwnerId);
 
@@ -120,7 +120,7 @@ exports.createJobBid = async (req, res) => {
             return
         }
 
-        socketService.emitToUser(jobOwnerId, "notification", { message: "You have a new bid on your job", type: 'info' })
+        socketService.emitToUser(jobOwnerId, "data_notification", { active: true, message: `You have a new bid for ${jobTitle}` })
 
         res.status(200).json({ message: 'Job bid created successfully', data: newBid })
         
