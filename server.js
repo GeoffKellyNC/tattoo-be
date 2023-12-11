@@ -64,24 +64,24 @@ const io = new Server(httpServer, {
 });
 
 // Socket.IO connection logic
-io.on('connection', (socket) => {
-    // Extract the unx_id from the query parameters
-    const unx_id = socket.handshake.auth.unx_id;
-    console.log("User connected: ", unx_id) //!REMOVE
+// io.on('connection', (socket) => {
+//     // Extract the unx_id from the query parameters
+//     const unx_id = socket.handshake.query.unx_id;
+//     console.log("🔥🔥🔥🔥User connected: ", unx_id) //!REMOVE
 
-    if (unx_id) {
-        socketService.registerSocket(unx_id, socket);
+//     if (unx_id) {
+//         socketService.registerSocket(unx_id, socket);
 
-        socket.on('disconnect', () => {
-            console.log("User disconnected: ", unx_id) //!REMOVE
-            socketService.unregisterSocket(unx_id);
-        });
+//         socket.on('disconnect', () => {
+//             console.log("User disconnected: ", unx_id) //!REMOVE
+//             socketService.unregisterSocket(unx_id);
+//         });
 
-    } else {
-        console.log("unx_id not provided"); //!REMOVE
-        socket.disconnect(); // Disconnect if unx_id is not provided
-    }
-});
+//     } else {
+//         console.log("unx_id not provided"); //!REMOVE
+//         socket.disconnect(); // Disconnect if unx_id is not provided
+//     }
+// });
 
 // Export the HTTP server
 module.exports = httpServer;
