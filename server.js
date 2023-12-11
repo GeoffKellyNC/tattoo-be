@@ -18,7 +18,7 @@ if (process.env.ENV_TYPE === 'production') {
     console.log("RUNNING DEVELOPMENT");
 }
 
-const allowedCorsOrigins = ['https://dev.getlinkd.ink', 'https://linkd-dev.netlify.app'];
+const allowedCorsOrigins = ['https://dev.getlinkd.ink', 'https://linkd-dev.netlify.app', 'http://localhost:5173'];
 if (process.env.LOCAL_MODE) {
     server.use(cors({
         origin: 'http://localhost:5173',
@@ -64,24 +64,26 @@ const io = new Server(httpServer, {
 });
 
 // Socket.IO connection logic
-// io.on('connection', (socket) => {
-//     // Extract the unx_id from the query parameters
-//     const unx_id = socket.handshake.query.unx_id;
-//     console.log("🔥🔥🔥🔥User connected: ", unx_id) //!REMOVE
+io.on('connection', (socket) => {
+    const unx_id = socket.handshake.query.unx_id;
 
-//     if (unx_id) {
-//         socketService.registerSocket(unx_id, socket);
+    if (unx_id) {
+        socketService.registerSocket(unx_id, socket);
 
-//         socket.on('disconnect', () => {
-//             console.log("User disconnected: ", unx_id) //!REMOVE
-//             socketService.unregisterSocket(unx_id);
-//         });
+        // setInterval(() => {
+        //     socketService.emitToUser(unx_id, "notification", { message: "This is a test notification", type: 'info' })
+        // }, 5000) // 5 seconds;
 
-//     } else {
-//         console.log("unx_id not provided"); //!REMOVE
-//         socket.disconnect(); // Disconnect if unx_id is not provided
-//     }
-// });
+        socket.on('disconnect', () => {
+            console.log("User disconnected: ", unx_id) //!REMOVE
+            socketService.unregisterSocket(unx_id);
+        });
+
+    } else {
+        console.log("unx_id not provided"); //!REMOVE
+        socket.disconnect(); // Disconnect if unx_id is not provided
+    }
+});
 
 // Export the HTTP server
 module.exports = httpServer;

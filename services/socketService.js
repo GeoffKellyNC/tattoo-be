@@ -1,7 +1,10 @@
 const userSockets = {};
 
 const registerSocket = (unx_id, socket) => {
+    console.log('Registering socket for user: ', unx_id); //!REMOVE
     userSockets[unx_id] = socket;
+    console.log('userSockets: ', userSockets[unx_id].client); //!REMOVE
+
 };
 
 const unregisterSocket = (unx_id) => {

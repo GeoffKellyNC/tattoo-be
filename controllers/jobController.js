@@ -1,5 +1,6 @@
 const Job = require('../models/Job')
 const sanitizeBidData = require('../util/sanitizeBidData');
+const socketService = require('../services/socketService');
 
 exports.createJob = async (req, res) => {
     try {
@@ -118,6 +119,8 @@ exports.createJobBid = async (req, res) => {
             res.status(400).json({message: 'Error creating job bid'})
             return
         }
+
+        socketService.emitToUser(jobOwnerId, "notification", { message: "You have a new bid on your job", type: 'info' })
 
         res.status(200).json({ message: 'Job bid created successfully', data: newBid })
         
