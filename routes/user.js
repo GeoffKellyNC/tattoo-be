@@ -53,6 +53,26 @@ router
     .route('/location-data')
     .post(locationControllers.getUserLocationData)
 
+router
+    .route('/update-user-data')
+    .post(userControllers.updateUserData)
+
+router
+    .route('/update-artist-details')
+    .post(userControllers.updateArtistDetails)
+
+router
+    .route('/get-artist-details')
+    .get(userControllers.getArtistDetails)
+
+router
+    .route('/update-contact-info')
+    .post(userControllers.updateContactDetails)
+
+router
+    .route('/get-contact-details')
+    .get(userControllers.getContactDetails)
+
 
     
 

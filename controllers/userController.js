@@ -264,4 +264,101 @@ exports.updateUserEmailForVerification = async (req, res) => {
     }
 }
 
+exports.updateUserData = async (req, res) => {
+    try {
+        const unxid = req.headers['user_unx_id']
+        const { data, type } = req.body;
+
+        const updatedData = await User.updateUserData(type, data, unxid);
+
+        if (!updatedData) {
+            res.status(500).json({ message: 'Failed to update user data.' });
+            return;
+        }
+
+        res.status(200).json({ message: `Updated!` });
+        
+    } catch (error) {
+        console.log('Error updating user data:', error);
+        res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    }
+}
+
+exports.updateArtistDetails = async (req, res) => {
+    try {
+        const unxid = req.headers['user_unx_id']
+        const data = req.body;
+
+        const updatedData = await User.updateArtistDetails(unxid, data);
+
+        if (!updatedData) {
+            res.status(500).json({ message: 'Failed to update user data.' });
+            return;
+        }
+
+        res.status(200).json({ message: `Updated!` });
+        
+    } catch (error) {
+        console.log('Error updating user data:', error);
+        res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    }
+}
+
+exports.getArtistDetails = async (req, res) => {
+    try {
+        const unxid = req.headers['user_unx_id']
+        const artists = await User.getArtistDetails(unxid);
+
+        if (!artists) {
+            res.status(500).json({ message: 'Failed to fetch artists.' });
+            return;
+        }
+
+        res.status(200).json({ data: artists });
+    } catch (error) {
+        console.log('Error fetching artists:', error);
+        res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    }
+}
+
+
+exports.updateContactDetails = async (req, res) => {
+    try {
+        const unxid = req.headers['user_unx_id']
+        const data = req.body;
+
+        const updatedData = await User.updateContactDetails(unxid, data);
+
+        if (!updatedData) {
+            res.status(500).json({ message: 'Failed to update user data.' });
+            return;
+        }
+
+        res.status(200).json({ message: `Updated!` });
+        
+    } catch (error) {
+        console.log('Error updating user data:', error);
+        res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    }
+}
+
+
+exports.getContactDetails = async (req, res) => {
+    try {
+        const unxid = req.headers['user_unx_id']
+        const contactDetails = await User.getContactDetailsClient(unxid);
+
+        if (!contactDetails) {
+            res.status(500).json({ message: 'Failed to fetch contact details.' });
+            return;
+        }
+
+        res.status(200).json({ data: contactDetails });
+    } catch (error) {
+        console.log('Error fetching contact details:', error);
+        res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    }
+}
+
+
 

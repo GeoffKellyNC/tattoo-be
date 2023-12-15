@@ -319,6 +319,14 @@ class Job {
                         as: "contactInfo"
                     }
                 },
+                {
+                    $lookup: {
+                        from: "client-uploaded-images",
+                        localField: "user_unxid",
+                        foreignField: "user_unxid",
+                        as: "userImages"
+                    }
+                },
                 { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
                 { $unwind: { path: "$profileImage", preserveNullAndEmptyArrays: true } },
                 { $unwind: { path: "$userDetails", preserveNullAndEmptyArrays: true } },

@@ -2,6 +2,9 @@ require("dotenv").config();
 const { mongo } = require('../db/config')
 const { v4: uuid} = require('uuid');
 const { hashUserPassword }= require("./Auth")
+const Auth = require('./Auth')
+const sendVerificationEmail = require('../util/emailVerifyMailer');
+const socketService = require('../services/socketService');
 
 
 const db = mongo.db(process.env.MONGO_DB_NAME)
@@ -704,6 +707,133 @@ class User {
             return true
         } catch (error) {
             console.log(error) //TODO: Handle this error
+            return false
+        }
+    }
+
+    static updateUserData = async (property, data, unxid) => {
+        switch(property){
+            case 'email':
+                try {
+                    console.log('Updating Email', unxid) //!REMOVE
+                    await db.collection('users').updateOne({ unxid: unxid }, { $set: { user_email: data.user_email, email_verified: false } })
+                    console.log('Sending Email') //!REMOVE
+
+                    const verificationCode = await Auth.createVerificationCode(unxid);
+
+                    await sendVerificationEmail(unxid, data.user_email, verificationCode);
+
+                    socketService.emitToUser(unxid, "data_notification", { active: true, message: `You have updated your email to ${data.user_email}. Please verify your new email!` })
+
+                    console.log('Email Sent ') //!REMOVE
+
+                    setTimeout(() => {
+                        console.log('Sending Logout') //!REMOVE
+                        socketService.emitToUser(unxid, "log_out")
+                    }, 5000) // 5 seconds;
+
+                    return true
+
+                } catch (error) {
+                    console.log(error) //TODO: Handle this error
+                    return false
+                }
+            case 'display_name':
+                try {
+                    console.log('Updating Display Name') //!REMOVE
+                    await db.collection('users').updateOne({ unxid: unxid }, { $set: { display_name: data.display_name } })
+
+                    return true
+
+                } catch (error) {
+                    console.log(error) //TODO: Handle this error
+                    return false
+                }
+            case 'all':
+                try {
+
+                    console.log('Updating All', unxid) //!REMOVE
+                    await db.collection('users').updateOne({ unxid: unxid }, { $set: { user_email: data.user_email, display_name: data.display_name, email_verified: false } })
+
+                    const verificationCode = await Auth.createVerificationCode(unxid);
+
+                    console.log('Sending Email') //!REMOVE
+
+                    await sendVerificationEmail(unxid, data.user_email, verificationCode);
+
+                    socketService.emitToUser(unxid, "data_notification", { active: true, message: `You have updated your email to ${data.user_email}. Please verify your new email!` })
+
+                    setTimeout(() => {
+                        console.log('Sending Logout') //!REMOVE
+                        socketService.emitToUser(unxid, "log_out")
+                    }, 5000) // 5 seconds;
+
+                    return true
+
+                } catch (error) {
+
+                    console.log(error) //TODO: Handle this error
+
+                    return false
+                }
+                
+            default:
+                console.log('Error: Invalid Property')
+                return false
+        }
+    }
+
+    static async updateArtistDetails(unxid, data) {
+        try {
+            await db.collection('user-artists-data').updateOne({ user_unxid: unxid }, { $set: {
+                years_experience: data.years_experience,
+                studio_affiliation: data.studio_affiliation,
+                studio_url: data.studio_url,
+                is_licenced: data.is_licenced,
+                portfolio: data.portfolio_url,
+                uses_booking_system: data.uses_booking_system,
+                studio_name: data.studio_name,
+            } })
+
+            return true
+        } catch (error) {
+            console.log('Error Updating Artist Details: ', error) //TODO: Handle this error (LOG)
+            return false
+        }
+    }
+
+    static async updateContactDetails(unxid, data){
+        try {
+            await db.collection('client-contact-info').updateOne({
+                user_unxid: unxid
+            }, {
+                $set: {
+                    contact_phone: {
+                        public: data.contact_phone.public,
+                        value: data.contact_phone.value
+                    },
+                    contact_instagram: {
+                        public: data.contact_instagram.public,
+                        value: data.contact_instagram.value
+                    },
+                    contact_snapchat: {
+                        public: data.contact_snapchat.public,
+                        value: data.contact_snapchat.value
+                    },
+                    contact_x: {
+                        public: data.contact_x.public,
+                        value: data.contact_x.value
+                    },
+                    contact_discord: {
+                        public: data.contact_discord.public,
+                        value: data.contact_discord.value
+                    },
+                }
+            })
+
+            return true
+        } catch (error) {
+            console.log('Error Updating Contact Details: ', error) //TODO: Handle this error (LOG)
             return false
         }
     }
