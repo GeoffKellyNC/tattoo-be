@@ -236,3 +236,26 @@ exports.getArtistDetailsForBid = async (req, res) => {
     }
 }
 
+exports.fetchPaginatedJobs = async (req, res) => {
+    try {
+        console.log('Fetching paginated jobs') //!REMOVE
+        const { page, limit } = req.query;
+
+        console.log('Page: ', page) //!REMOVE
+        console.log('Limit: ', limit) //!REMOVE
+
+        const users = await Job.fetchPaginatedJobs(parseInt(page, 10), parseInt(limit, 10));
+
+        if(!users){
+            res.status(400).json({message: 'Error retrieving paginated jobs'})
+            return
+        }
+
+        res.status(200).json({ data: users })
+        
+    } catch (error) {
+        console.log('Error fetching paginated jobs: ', error) //TODO: Handle this error
+        res.status(500).json({ message: 'Error fetching paginated jobs', error })
+    }
+}
+

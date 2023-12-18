@@ -28,7 +28,7 @@ async function authMiddleware(req, res, next) {
         }
     
         // Verify the token's authenticity
-        const decoded_data = await Auth.verifyJWT(jwtToken);
+        const decoded_data = await Auth.verifyJWT(jwtToken, user_unxid);
 
         if (!decoded_data) {
             return res.status(401).json({ message: 'Invalid token.' });

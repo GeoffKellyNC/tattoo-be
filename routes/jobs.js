@@ -44,5 +44,9 @@ router
     .route('/get-artist-details-bid/:artistId')
     .get(jobControllers.getArtistDetailsForBid)
 
+router
+    .route('/get-paginated-jobs')
+    .get(jobControllers.fetchPaginatedJobs);
+
 
 module.exports = router;

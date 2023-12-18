@@ -366,6 +366,20 @@ class Job {
             return false
         }
     }
+
+    static async fetchPaginatedJobs(page = 1, limit = 10) {
+        const skip = (page - 1) * limit;
+
+        try {
+            const jobs = await db.collection('active-user-jobs').find(
+                {is_active: true}).skip(skip).limit(limit).toArray()
+            
+            return jobs
+        } catch (error) {
+            console.log('Error fetching pagenated jobs: ', error) //TODO: Handle this error
+            return false
+        }
+    }
 }
 
 module.exports = Job

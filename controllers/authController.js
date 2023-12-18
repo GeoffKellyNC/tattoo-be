@@ -2,6 +2,7 @@ const User = require('../models/User')
 const Auth = require('../models/Auth')
 const sendResetPassEmail = require('../util/resetPasswordMailer')
 const sanitizeUserData = require('../util/sanitizeUserData')
+const socketService = require('../services/socketService')
 
 
 exports.login = async (req, res) => {
@@ -94,6 +95,7 @@ exports.logout = async (req, res) => {
 exports.verifyUserAccess = async (req, res) => {
     try {
         const jwt = req.headers['auth-token']
+        const unxid = req.headers['user_unx_id']
         
         // check to make sure token has not expired, make sure the token is valid
 
@@ -101,6 +103,8 @@ exports.verifyUserAccess = async (req, res) => {
 
         if(!decoded_data){
             res.status(400).json({message: 'Invalid token'})
+            socketService.emitToUser(unxid, "log_out")
+            socketService.unregisterSocket(unxid)
             return
         }
 

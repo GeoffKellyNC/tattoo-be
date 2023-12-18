@@ -54,7 +54,7 @@ const generateJWT = async (user) => {
 
 }
 
-const verifyJWT = async (token) => {
+const verifyJWT = async (token, unxid = null) => {
     try {
         const secret = process.env.JWT_SECRET;
         const decoded = jwt.verify(token, secret);
