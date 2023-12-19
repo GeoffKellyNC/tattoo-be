@@ -48,5 +48,9 @@ router
     .route('/get-paginated-jobs')
     .get(jobControllers.fetchPaginatedJobs);
 
+router
+    .route('/get-paginated-job-location')
+    .get(jobControllers.fetchPaginatedJobsLocation);
+
 
 module.exports = router;

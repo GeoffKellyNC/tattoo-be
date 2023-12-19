@@ -2,6 +2,7 @@ require("dotenv").config();
 const { mongo } = require('../db/config')
 const { v4: uuid} = require('uuid');
 const { bucket } = require('../google/gcs-img-config')
+const zipToCords = require('../google/zipToCords')
 
 
 const db = mongo.db(process.env.MONGO_DB_NAME)
@@ -41,7 +42,7 @@ class Job {
         try{
             const finalJobObj = {
                 job_id: this.job_id,
-                owner_id: this.owner_id,
+                owner_id: this.owner_id.toLowerCase(),
                 owner_user_name: this.owner_user_name,
                 job_created_date: this.job_created_date,
                 job_title: this.job_title,
@@ -380,6 +381,86 @@ class Job {
             return false
         }
     }
+
+    static async fetchPaginatedJobsLocation(page = 1, limit = 10, lat, lng, radius) {
+        console.log('Starting fetchPaginatedJobsLocation'); //!REMOVE
+        const skip = (page - 1) * limit;
+        const radiusInMeters = radius ? radius * 1609.34 : null;
+    
+        let geoNearStage = {};
+        if (lat !== undefined && lng !== undefined && radius !== undefined) {
+            geoNearStage = {
+                $geoNear: {
+                    near: { type: "Point", coordinates: [ parseFloat(lng), parseFloat(lat) ] },
+                    distanceField: "location_data.dist.calculated",
+                    maxDistance: radiusInMeters,
+                    spherical: true,
+                    key: "location"
+                }
+            };
+        } else {
+            console.log('Latitude, Longitude, or Radius is undefined'); //!REMOVE
+        }
+    
+        try {
+            console.log('Running aggregation query'); //!REMOVE
+            const jobs = await db.collection('job-location-data').aggregate([
+                geoNearStage,
+                {
+                    $lookup: {
+                        from: "active-user-jobs",
+                        localField: "job_id",
+                        foreignField: "job_id",
+                        as: "job_info"
+                    }
+                },
+                { $unwind: "$job_info" },
+                { $match: { "job_info.is_active": true } },
+                { $skip: skip },
+                { $limit: limit },
+                { $project: { job_info: 1, "location_data.dist.calculated": 1 } }
+            ]).toArray();
+    
+            console.log('Jobs fetched:', jobs.length); //!REMOVE
+            const mappedJobs = jobs.map(job => ({ ...job.job_info, distance: job.location_data.dist.calculated }));
+            return mappedJobs;
+        } catch (error) {
+            console.error('Error fetching paginated jobs by location: ', error); //TODO: Handle this error
+            return false;
+        }
+    }
+    
+      
+
+async setJobLocationCords(job_id, owner_id, zipcode){
+    try{
+        const cords = await zipToCords(zipcode, owner_id);
+
+        if(!cords){
+            return false;
+        }
+
+        // Constructing the location data in GeoJSON format
+        const locationData = {
+            type: "Point",
+            coordinates: [cords.lng, cords.lat] // Note: In GeoJSON, longitude comes first
+        };
+
+        const data = {
+            job_id: job_id,
+            owner_id: owner_id,
+            location: locationData // Storing the GeoJSON object
+        };
+        
+        await db.collection('job-location-data').insertOne(data);
+
+        return true;
+    } catch(err){
+        console.error('Error setting job location cords: ', err);
+        return false;
+    }
+}
+
 }
 
 module.exports = Job

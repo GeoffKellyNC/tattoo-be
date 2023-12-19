@@ -13,8 +13,16 @@ exports.createJob = async (req, res) => {
 
         const job = new Job(jobData, unxid);
         const jobSaved = await job.save();
+        const locationSave = await job.setJobLocationCords(jobSaved.job_id, unxid, jobSaved.job_zipcode)
+
+
         if (!jobSaved) {
             res.status(500).json({ message: 'Failed to save job' });
+            return;
+        }
+
+        if(!locationSave){
+            res.status(500).json({ message: 'Failed to save job location' });
             return;
         }
         
@@ -255,6 +263,27 @@ exports.fetchPaginatedJobs = async (req, res) => {
         
     } catch (error) {
         console.log('Error fetching paginated jobs: ', error) //TODO: Handle this error
+        res.status(500).json({ message: 'Error fetching paginated jobs', error })
+    }
+}
+    
+
+exports.fetchPaginatedJobsLocation = async (req, res) => {
+    try {
+        const { page, limit, lat, lng, radius } = req.query;
+
+
+        const jobs = await Job.fetchPaginatedJobsLocation(parseInt(page, 10), parseInt(limit, 10), parseFloat(lat), parseFloat(lng), parseFloat(radius));
+
+
+        if(!jobs){
+            res.status(400).json({message: 'Error retrieving paginated jobs'})
+            return
+        }
+
+        res.status(200).json({ data: jobs })
+
+    } catch (error) {
         res.status(500).json({ message: 'Error fetching paginated jobs', error })
     }
 }

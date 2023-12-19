@@ -2,6 +2,10 @@ const userSockets = {};
 
 const registerSocket = (unx_id, socket) => {
     console.log('Registering socket for user: ', unx_id); //!REMOVE
+    const existingSocket = userSockets[unx_id];
+    if (existingSocket) {
+        return;
+    }
     userSockets[unx_id] = socket;
 
 };
@@ -11,9 +15,6 @@ const unregisterSocket = (unx_id) => {
 };
 
 const emitToUser = (unx_id, event, data = null) => {
-    console.log('Emitting to user: ', unx_id); //!REMOVE
-    console.log('Event: ', event); //!REMOVE
-    console.log('Data: ', data); //!REMOVE
     
     if (userSockets[unx_id]) {
         userSockets[unx_id].emit(event, data);
