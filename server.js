@@ -32,12 +32,12 @@ if (process.env.LOCAL_MODE) {
 }
 
 server.use(cookieParser());
-server.use(express.json()); 
 server.use(authMiddleware);
 
 // Exclude webhook JSON middleware (if needed)
 const excludeWebhookJsonMiddleware = (req, res, next) => {
     if (req.path.includes("webhook")) {
+        console.log("Webhook hit, excluding JSON middleware"); //!REMOVE
         next();
     } else {
         express.json()(req, res, next);
