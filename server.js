@@ -37,7 +37,6 @@ server.use(authMiddleware);
 // Exclude webhook JSON middleware (if needed)
 const excludeWebhookJsonMiddleware = (req, res, next) => {
     if (req.path.includes("webhook")) {
-        console.log("Webhook hit, excluding JSON middleware"); //!REMOVE
         next();
     } else {
         express.json()(req, res, next);
