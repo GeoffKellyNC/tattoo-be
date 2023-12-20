@@ -14,6 +14,8 @@ exports.stripeWebhook = async (req, res) => {
         if(endpointSecret){
             const signiture = req.headers['stripe-signature']
 
+            console.log('STRIPE signiture: ', signiture) //!REMOVE
+
             try {
                 event = stripe.webhooks.constructEvent(
                     req.body,
