@@ -288,3 +288,39 @@ exports.fetchPaginatedJobsLocation = async (req, res) => {
     }
 }
 
+exports.clientAcceptBid = async (req, res) => {
+    try {
+
+        console.log('Client Accept Bid Route... ') //!REMOVE
+        const user_id = req.headers["user_unx_id"]
+
+        const { job_id, artist_id} = req.body
+
+        console.log('Starting Accept Bid Process...') //!REMOVE
+        const updatedJobData = await Job.clientAcceptBid(job_id, artist_id)
+
+        if(!updatedJobData){
+            socketService.emitToUser(user_id, 'notification', {
+                message: 'Error Accepting Job Bid! Please try again',
+                type: 'error'
+            })
+            res.status(500).json({message: 'There was an issue accepting bid.'})
+        }
+
+        console.log('Sending Socket Notification...') //!REMOVE
+        socketService.emitToUser(user_id, 'notification', {
+            message: `Succesfully Accepted Bid for ${updatedJobData.job_title} `,
+            type: 'info'
+        })
+
+        console.log('Sending Response...') //!REMOVE
+        res.status(200).json({message: 'Success', data: updatedJobData})
+        return
+
+        
+    } catch (error) {
+        console.log('Error accepting bid: ', error) //TODO: Handle this error
+        res.status(500).json({ message: 'Error Accepting Bid', error})
+        return
+    }
+}

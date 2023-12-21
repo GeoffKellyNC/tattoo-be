@@ -232,7 +232,7 @@ class Job {
                 timestamp: new Date(),
                 is_active: true,
                 is_deleted: false,
-                attr1: null,
+                attr1: null, // This is where the acceptedBid infor object will go.
                 attr2: null,
                 attr3: null,
                 attr4: null,
@@ -460,6 +460,53 @@ async setJobLocationCords(job_id, owner_id, zipcode){
         return false;
     }
 }
+
+    static async clientAcceptBid(job_id, artist_id ){
+        try {
+        
+            console.log('Getting Original Job Data...') //!REMOVE
+            const job = await db.collection('active-user-jobs').findOne({job_id})
+            const bidData = await db.collection('active-job-bids').findOne({job_id, artist_id})
+
+            if(!job){
+                return false
+            }
+
+            console.log('Updating Job Data...') //!REMOVE
+            const updatedJob = {
+                ...job,
+                selected_artist_id: artist_id,
+                job_status: 'in-progress',
+                is_active: false,
+                attr1: bidData
+            }
+            
+            console.log('Updating Job Data in DB...') //!REMOVE
+            await db.collection('accepted-client-jobs').insertOne(updatedJob)
+
+            console.log('Deleting Job Data from Active Jobs...') //!REMOVE
+            await db.collection('active-user-jobs').deleteOne({job_id})
+
+
+            console.log('Updating Job Bids...') //!REMOVE
+            await db.collection('active-job-bids').updateMany({job_id}, {$set: {is_active: false}})
+
+            console.log('Updating All Other Job Bids...') //!REMOVE
+            await db.collection('active-job-bids').findOneAndUpdate(
+                { job_id, artist_id }, 
+                { $set: { is_active: false } }, 
+                { returnOriginal: false }
+            );
+
+            console.log('SUCCESS: Job Accepted!') //!REMOVE
+
+            return updatedJob
+
+        } catch (error) {
+            console.log('Error accepting bid: ', error) //TODO: Handle this error
+            return false
+        }
+    }
 
 }
 

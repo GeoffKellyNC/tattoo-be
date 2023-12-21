@@ -52,5 +52,9 @@ router
     .route('/get-paginated-job-location')
     .get(jobControllers.fetchPaginatedJobsLocation);
 
+router
+    .route('/accept-bid')
+    .post(jobControllers.clientAcceptBid)
+
 
 module.exports = router;
