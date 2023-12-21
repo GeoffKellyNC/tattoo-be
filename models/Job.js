@@ -508,6 +508,16 @@ async setJobLocationCords(job_id, owner_id, zipcode){
         }
     }
 
+    static getAcceptedJobsArtist(artist_id){
+        try{
+            const jobs = db.collection('accepted-client-jobs').find({selected_artist_id: artist_id}).toArray()
+            return jobs
+        }catch(err){
+            console.log('Error getting accepted jobs: ', err) //TODO: Handle this error
+            return false
+        }
+    }
+
 }
 
 module.exports = Job

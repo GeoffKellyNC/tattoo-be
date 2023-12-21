@@ -56,5 +56,9 @@ router
     .route('/accept-bid')
     .post(jobControllers.clientAcceptBid)
 
+router
+    .route('/get-accepted-jobs-artist')
+    .get(jobControllers.getAcceptedJobsForArtist)
+
 
 module.exports = router;
