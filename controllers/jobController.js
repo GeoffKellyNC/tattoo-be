@@ -349,3 +349,30 @@ exports.getAcceptedJobsForArtist = async (req, res) => {
         return
     }
 }
+
+exports.getAcceptedJobsOwner = async (req, res) => {
+    try {
+        const user_id = req.headers["user_unx_id"]
+
+        if(!user_id){
+            res.status(400).json({message: 'Error: Invalid User ID!'})
+            return
+        }
+
+        const jobs = await Job.getAcceptedJobsOwner(user_id);
+
+        if(!jobs){
+            res.status(400).json({message: 'Error retrieving jobs'})
+            return
+        }
+
+        res.status(200).json({ message: 'Jobs retrieved successfully', data: jobs })
+
+    } catch (error) {
+        console.log('Error retrieving jobs: ', error) //TODO: Handle this error
+        res.status(500).json({ message: 'Error retrieving jobs', error })
+        return
+    }
+}
+
+

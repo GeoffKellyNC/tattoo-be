@@ -60,5 +60,9 @@ router
     .route('/get-accepted-jobs-artist')
     .get(jobControllers.getAcceptedJobsForArtist)
 
+router
+    .route('/get-accepted-jobs-client')
+    .get(jobControllers.getAcceptedJobsOwner)
+
 
 module.exports = router;
