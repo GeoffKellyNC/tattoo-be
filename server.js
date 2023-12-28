@@ -18,7 +18,7 @@ if (process.env.ENV_TYPE === 'production') {
     console.log("RUNNING DEVELOPMENT");
 }
 
-const allowedCorsOrigins = ['https://dev.getlinkd.ink', 'https://linkd-dev.netlify.app', 'http://localhost:5173'];
+const allowedCorsOrigins = ['https://dev.getlinkd.ink', 'https://linkd-dev.netlify.app', 'http://localhost:5173', 'https://getlinkd.ink'];
 if (process.env.LOCAL_MODE) {
     server.use(cors({
         origin: 'http://localhost:5173',
@@ -51,6 +51,7 @@ server.use('/auth', require('./routes/auth'));
 server.use('/user', require('./routes/user'));
 server.use('/jobs', require('./routes/jobs'));
 server.use('/stripe', require('./routes/stripe'));
+server.use('/ai', require('./routes/ai'));
 
 const httpServer = http.createServer(server);
 

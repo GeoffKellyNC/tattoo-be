@@ -837,9 +837,10 @@ class User {
             return false
         }
     }
-    
-    
+
+
 }
+    
 
 
 module.exports = User;

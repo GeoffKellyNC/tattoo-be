@@ -40,10 +40,7 @@ exports.addPhotosToJob = async (req, res) => {
 
 
         await files.forEach(file => {
-            console.log('Uploading for Job:', job_id)
-            console.log('Uploading File: ', file)
             Job.uploadJobPhoto(unxid, file, job_id)
-            console.log('Uploaded....')
         })
 
         const updatedJob = await Job.getJobById(job_id)
@@ -219,7 +216,6 @@ exports.getJobById = async (req, res) => {
 
 exports.getArtistDetailsForBid = async (req, res) => {
     try {
-        console.log('Getting artist details for bid') //!REMOVE
         const artistId = req.params.artistId
 
         if(!artistId){
@@ -234,7 +230,6 @@ exports.getArtistDetailsForBid = async (req, res) => {
             return
         }
 
-        console.log('Artist Data: ', artistData)//!REMOVE
 
         res.status(200).json({ message: 'Artist data retrieved successfully', data: artistData })
         
@@ -246,11 +241,8 @@ exports.getArtistDetailsForBid = async (req, res) => {
 
 exports.fetchPaginatedJobs = async (req, res) => {
     try {
-        console.log('Fetching paginated jobs') //!REMOVE
         const { page, limit } = req.query;
 
-        console.log('Page: ', page) //!REMOVE
-        console.log('Limit: ', limit) //!REMOVE
 
         const users = await Job.fetchPaginatedJobs(parseInt(page, 10), parseInt(limit, 10));
 
@@ -291,12 +283,10 @@ exports.fetchPaginatedJobsLocation = async (req, res) => {
 exports.clientAcceptBid = async (req, res) => {
     try {
 
-        console.log('Client Accept Bid Route... ') //!REMOVE
         const user_id = req.headers["user_unx_id"]
 
         const { job_id, artist_id} = req.body
 
-        console.log('Starting Accept Bid Process...') //!REMOVE
         const updatedJobData = await Job.clientAcceptBid(job_id, artist_id)
 
         if(!updatedJobData){
@@ -307,13 +297,11 @@ exports.clientAcceptBid = async (req, res) => {
             res.status(500).json({message: 'There was an issue accepting bid.'})
         }
 
-        console.log('Sending Socket Notification...') //!REMOVE
         socketService.emitToUser(user_id, 'notification', {
             message: `Succesfully Accepted Bid for ${updatedJobData.job_title} `,
             type: 'info'
         })
 
-        console.log('Sending Response...') //!REMOVE
         res.status(200).json({message: 'Success', data: updatedJobData})
         return
 
@@ -373,6 +361,71 @@ exports.getAcceptedJobsOwner = async (req, res) => {
         res.status(500).json({ message: 'Error retrieving jobs', error })
         return
     }
+}
+
+
+exports.getArtistsDataForJob = async (req, res) => {
+    try {
+
+        const unx_id = req.headers["user_unx_id"]
+
+       const { artistId } = req.query
+
+
+         if(!artistId){
+            res.status(400).json({message: 'Error: Invalid Artist ID!'})
+            return
+        }
+
+        const artistData = await Job.getArtistDataForJob(artistId);
+
+
+        if(!artistData){
+            socketService.emitToUser(unx_id, 'notification', {
+                message: 'Error Retrieving Artist Data! Please Refresh Page.',
+                type: 'error'
+            })
+
+            res.status(400).json({message: 'Error retrieving artist data'})
+            return
+        }
+
+        res.status(200).json({ message: 'Artist data retrieved successfully', data: artistData })
+
+    } catch (error) {
+        console.log('Error retrieving jobs: ', error) //TODO: Handle this error
+        res.status(500).json({ message: 'Error retrieving jobs', error })
+        return
+    }
+}
+
+exports.getAcceptedBidData = async (req, res) => {
+    try {
+        const { jobId } = req.query
+
+        console.log('jobId: ', jobId) //!REMOVE
+
+        if(!jobId){
+            res.status(400).json({message: 'Error: Invalid Job ID!'})
+            return
+        }
+
+        const bidData = await Job.getAcceptedBidData(jobId);
+
+        console.log('bidData: ', bidData) //!REMOVE
+
+        if(!bidData){
+            res.status(400).json({message: 'Error retrieving bid data'})
+            return
+        }
+
+        res.status(200).json({ message: 'Bid data retrieved successfully', data: bidData })
+
+    } catch (error) {
+        console.log('Error retrieving bid data: ', error) //TODO: Handle this error
+        res.status(500).json({ message: 'Error retrieving bid data', error })
+        return
+    } 
 }
 
 

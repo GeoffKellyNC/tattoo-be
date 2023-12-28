@@ -518,15 +518,109 @@ async setJobLocationCords(job_id, owner_id, zipcode){
         }
     }
 
-    static getAcceptedJobsOwner(owner_id){
+    static async getAcceptedJobsOwner(owner_id){
         try{
-            const jobs = db.collection('accepted-client-jobs').find({owner_id}).toArray()
+            const jobs = await db.collection('accepted-client-jobs').find({owner_id}).toArray()
             return jobs
         }catch(err){
             console.log('Error getting accepted jobs: ', err) //TODO: Handle this error
             return false
         }
     }
+
+    static async deleteJob(job_id, owner_id) {
+        try {
+            
+            await db.collection('active-user-jobs').updateMany({
+                job_id,
+                owner_id
+            }, {
+                $set: {
+                    is_active: false,
+                    is_deleted: true,
+                    date_deleted: new Date()
+                }
+            
+            })
+
+            await db.collection('active-job-bids').updateMany({
+                job_id,
+                job_owner_id: owner_id
+            }, {
+                $set: {
+                    is_active: false,
+                    is_deleted: true,
+                    date_deleted: new Date()
+                }
+            
+            })
+
+            return true
+            
+        } catch (error) {
+            console.log("Error Deleting Job", error) //!TODO: Handle This error
+            return false
+        }
+    }
+
+    static async getArtistDataForJob(artistId) {
+        try {
+            const artistData = await db.collection('user-artists-data').aggregate([
+                {
+                    $match: {
+                        user_unxid: artistId
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "client-contact-info",
+                        localField: "user_unxid",
+                        foreignField: "user_unxid",
+                        as: "contactInfo"
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "users", // Join with the users collection
+                        localField: "user_unxid",
+                        foreignField: "unxid", // Assuming 'unxid' is the connecting field in 'users'
+                        as: "userInfo"
+                    }
+                },
+                {
+                    $unwind: "$userInfo" // Unwind the userInfo to simplify the data structure
+                },
+                {
+                    $project: {
+                        // Include all fields from user-artists-data and contactInfo
+                        "user-artists-data": "$$ROOT",
+                        "contactInfo": 1,
+                        // Include only display_name and user_name from the users collection
+                        "display_name": "$userInfo.display_name",
+                        "user_name": "$userInfo.user_name"
+                    }
+                }
+            ]).toArray();
+    
+            return artistData;
+            
+        } catch (error) {
+            console.log('Error Getting Artist Data For Job: ', error);
+            return false;
+        }
+    }
+
+    static getAcceptedBidData = async (jobId) => {
+        try {
+            const bidData = await db.collection('accepted-client-jobs').findOne({ job_id: jobId });
+            return bidData;
+        } catch (error) {
+            console.log('Error Getting Accepted Bid Data: ', error);
+            return false;
+        }
+    }
+    
+    
     
 
 }
