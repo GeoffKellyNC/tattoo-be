@@ -1,4 +1,4 @@
-const { MongoClient } = require('mongodb');
+const { MongoClient, ServerApiVersion } = require('mongodb');
 
 const uri = process.env.LOCAL_MODE ? process.env.MONGO_URI_LOCAL : process.env.MONGO_URI;
 const mongo = new MongoClient(uri, {
