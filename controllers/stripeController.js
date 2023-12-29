@@ -9,7 +9,8 @@ exports.stripeWebhook = async (req, res) => {
     try {
         let event = req.body
 
-        const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+        // const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+        const endpointSecret = 'whsec_9a4998efca4dc7aa7153e533f42d61d8508befa4945b645969c14ae4a45ce269'
 
         if(endpointSecret){
             const signiture = req.headers['stripe-signature']
@@ -74,6 +75,12 @@ exports.stripeWebhook = async (req, res) => {
                 status = subscription.status;
                 await User.updateUserSubscription(subscription.customer, 'monthly', true)
                 break;
+            case 'invoice.paid':
+                const invoiceData = event.data.object;
+                const id = invoiceData.customer;
+                console.log('invoiceData: ', invoiceData) //!REMOVE
+                console.log('id: ', id) //!REMOVE
+                await User.updateUserSubscription(id, 'monthly', true)
             default:
                 console.log(`Unhandled event type ${event.type}.`);
         }
@@ -163,3 +170,20 @@ exports.createPortalSession = async (req, res) => {
         res.status(500).json({message: 'Error creating portal session', data: error})
     }
   };
+
+  exports.createPortalSessionWithCustomerId = async (req, res) => {
+    try {
+        const customerId = req.body.customer_id
+
+        const returnUrl = DOMAIN;
+      
+        const portalSession = await stripe.billingPortal.sessions.create({
+          customer: customerId,
+          return_url: returnUrl,
+        });
+      
+        res.status(200).json({data: portalSession.url})
+    } catch (error) {
+        res.status(500).json({message: 'Error creating portal session', data: error})
+    }
+  }

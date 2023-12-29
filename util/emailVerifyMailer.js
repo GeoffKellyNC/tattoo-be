@@ -17,7 +17,7 @@ const sendVerificationEmail = async (unxid, user_email, token) => {
             from: process.env.EMAIL_USER,
             to: user_email,
             subject: "LINK'D Email Verification",
-            text: `Click here to verify your email with LINK'D APP: ${SERVER_URL}/auth/verify-email?token=${token}&unxid=${unxid}`
+            text: `Click here to verify your email with LINK'D APP: ${SERVER_URL}/verify-email/${token}/${unxid}`
         };
         
         transporter.sendMail(mailOptions, function(error, info){

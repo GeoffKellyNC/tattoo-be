@@ -131,11 +131,11 @@ exports.verifyEmailController = async (req, res) => {
         const isValid = await Auth.verifyEmailCode(unxid, token);
 
         if (!isValid) {
-            res.status(400).send('Invalid or expired token.');
+            res.status(400).json({message: 'Invalid token', data: false})
             return;
         }
 
-        res.status(200).send('<h1> Email Verified Successfully Please login. </h1>');
+        res.status(200).json({message = 'Email verified successfully. Please login to continue.', data: true});
 
     } catch (error) {
         console.log('Error verifying email: ', error) //TODO: Handle this error
