@@ -15,11 +15,11 @@ async function authMiddleware(req, res, next) {
 
         if (excludedPaths.some(path => req.path.includes(path))) {
             return next();
-        }
+        } 
 
     
-        const jwtToken = req.headers['auth-token'];
-        const user_unxid = req.headers['user_unx_id']
+        const jwtToken = req.headers['auth-token']; 
+        const user_unxid = req.headers['user_unx_id'] 
 
 
     
