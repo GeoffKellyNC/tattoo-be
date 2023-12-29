@@ -6,6 +6,9 @@ const GOOGLE_BASE_URL = 'https://maps.googleapis.com/maps/api/geocode'
 
 const convertUserLocationData = async (lat, lng) => {
     try {
+        console.log('Converting User Location Data!') //!REMOVE
+        console.log('lat: ', lat) //!REMOVE
+        console.log('lng: ', lng) //!REMOVE
         const googleRes = await axios.get(`${GOOGLE_BASE_URL}/json?latlng=${lat},${lng}&key=${GOOGLE_GEO_KEY}`)
 
 
@@ -24,7 +27,7 @@ const convertUserLocationData = async (lat, lng) => {
 
 
     } catch (error) {
-        console.log('Error Converting User Location Data: ', error) //!TODO: Handle This Error (LOG)
+        console.log('Error Converting User Location Data: ', error.data) //!TODO: Handle This Error (LOG)
         return false
     }
 }

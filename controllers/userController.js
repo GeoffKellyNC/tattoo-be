@@ -206,9 +206,13 @@ exports.uploadClientImages = async (req, res) => {
 
 exports.fetchPaginatedUsers = async (req, res) => {
     try {
-        const { page, limit } = req.query;
+        const { page, limit, lat, lng } = req.query;
 
-        const users = await User.fetchPaginatedUsers(parseInt(page, 10), parseInt(limit, 10));
+        const query = req.query;
+
+
+
+        const users = await User.fetchPaginatedUsers(parseInt(page, 10), parseInt(limit, 10), { lat, lng });
 
         if (!users) {
             res.status(500).json({ message: 'Failed to fetch users.' });

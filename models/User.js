@@ -5,6 +5,8 @@ const { hashUserPassword }= require("./Auth")
 const Auth = require('./Auth')
 const sendVerificationEmail = require('../util/emailVerifyMailer');
 const socketService = require('../services/socketService');
+const axios = require('axios');
+const convertUserLocationData = require('../google/UserLocation')
 
 
 const db = mongo.db(process.env.MONGO_DB_NAME)
@@ -407,104 +409,125 @@ class User {
         }
     }
 
-    static async fetchPaginatedUsers(page = 1, limit = 10) {
+    static async fetchPaginatedUsers(page = 1, limit = 10, cordsObj) {
         const skipAmount = (page - 1) * limit;
-
+        const { lat, lng } = cordsObj;
+        let currentCity = null;
+    
         try {
-            const users = await db.collection('users').aggregate([
-                {
-                    $lookup: {
-                        from: "client-user-details",
-                        localField: "unxid",
-                        foreignField: "user_unxid",
-                        as: "userDetails"
-                    }
-                },
-                {
-                    $lookup: {
-                        from: "client-contact-info",
-                        localField: "unxid",
-                        foreignField: "user_unxid",
-                        as: "contactInfo"
-                    }
-                },
-                {
-                    $lookup: {
-                        from: "client-profile-image",
-                        let: { user_unxid: "$unxid" },
-                        pipeline: [
-                            {
-                                $match: {
-                                    $expr: {
-                                        $and: [
-                                            { $eq: ["$user_unxid", "$$user_unxid"] },
-                                            { $eq: ["$is_active", true] }
-                                        ]
+            const res = await convertUserLocationData(lat, lng);
+
+            if(!res){
+                return []
+            }
+
+            currentCity = res.city;
+
+        } catch (error) {
+            console.log('Error fetching city from cords: ', error); //TODO: Handle this error
+        }
+    
+        if (currentCity) {
+            try {
+                const users = await db.collection('users').aggregate([
+                    {
+                        $lookup: {
+                            from: "client-user-details",
+                            localField: "unxid",
+                            foreignField: "user_unxid",
+                            as: "userDetails"
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: "client-contact-info",
+                            localField: "unxid",
+                            foreignField: "user_unxid",
+                            as: "contactInfo"
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: "client-profile-image",
+                            let: { user_unxid: "$unxid" },
+                            pipeline: [
+                                {
+                                    $match: {
+                                        $expr: {
+                                            $and: [
+                                                { $eq: ["$user_unxid", "$$user_unxid"] },
+                                                { $eq: ["$is_active", true] }
+                                            ]
+                                        }
                                     }
                                 }
-                            }
-                        ],
-                        as: "profileImage"
+                            ],
+                            as: "profileImage"
+                        }
+                    },
+                    { $unwind: { path: "$userDetails", preserveNullAndEmptyArrays: true } },
+                    { $unwind: { path: "$contactInfo", preserveNullAndEmptyArrays: true } },
+                    { $unwind: { path: "$profileImage", preserveNullAndEmptyArrays: true } },
+                    {
+                        $match: {
+                            "userDetails.location_city": currentCity
+                        }
+                    },
+                    { $skip: skipAmount },
+                    { $limit: limit },
+                    {
+                        $project: {
+                            password: 0,
+                            user_email: 0,
+                            session_token: 0,
+                            account_status: 0,
+                            isMod: 0,
+                            isAdmin: 0,
+                            attr1: 0,
+                            attr2: 0,
+                            attr3: 0,
+                            attr4: 0,
+                            attr5: 0,
+                            attr6: 0,
+                            attr7: 0,
+                            attr8: 0,
+                            user_unxid: 0,
+                            subscription_active: 0,
+                            subscription_type: 0,
+                            subscription_start_date: 0,
+                            subscription_end_date: 0
+                        }
                     }
-                },
-                { $unwind: { path: "$userDetails", preserveNullAndEmptyArrays: true } },
-                { $unwind: { path: "$contactInfo", preserveNullAndEmptyArrays: true } },
-                { $unwind: { path: "$profileImage", preserveNullAndEmptyArrays: true } },
-                
-                {
-                    $skip: skipAmount
-                },
-                {
-                    $limit: limit
-                },
-                {
-                    $project: {
-                        password: 0,
-                        user_email: 0,
-                        session_token: 0,
-                        account_status: 0,
-                        isMod: 0,
-                        isAdmin: 0,
-                        attr1: 0,
-                        attr2: 0,
-                        attr3: 0,
-                        attr4: 0,
-                        attr5: 0,
-                        attr6: 0,
-                        attr7: 0,
-                        attr8: 0,
-                        user_unxid: 0,
-                        subscription_active: 0,
-                        subscription_type: 0,
-                        subscription_start_date: 0,
-                        subscription_end_date: 0
+                ]).toArray();
+    
+                users.forEach(user => {
+                    if (user.userDetails) {
+                        Object.assign(user, user.userDetails);
+                        delete user.userDetails;
                     }
-                }
-            ]).toArray();
-
-            users.forEach(user => {
-                if (user.userDetails) {
-                    Object.assign(user, user.userDetails);
-                    delete user.userDetails;
-                }
-
-                if (user.contactInfo) {
-                    Object.assign(user, user.contactInfo);
-                    delete user.contactInfo;
-                }
-
-                if (user.profileImage) {
-                    user.profileImageUrl = user.profileImage.image_url;
-                    delete user.profileImage;
-                }
-            });
-
-            return users;
-        } catch (err) {
-            console.error("Error fetching paginated users:", err);
-            return null;
+    
+                    if (user.contactInfo) {
+                        Object.assign(user, user.contactInfo);
+                        delete user.contactInfo;
+                    }
+    
+                    if (user.profileImage) {
+                        user.profileImageUrl = user.profileImage.image_url;
+                        delete user.profileImage;
+                    }
+                });
+    
+                return users;
+            } catch (err) {
+                console.error("Error fetching paginated users:", err);
+                return null;
+            }
+        } else {
+            console.log("No city found for the provided coordinates");
+            return [];
         }
     }
+    
 
     static async fetchUserProfileByUnxid(unxid) {
         try {
