@@ -135,7 +135,7 @@ exports.verifyEmailController = async (req, res) => {
             return;
         }
 
-        res.status(200).json({message = 'Email verified successfully. Please login to continue.', data: true});
+        res.status(200).json({message: 'Email verified successfully. Please login to continue.', data: true});
 
     } catch (error) {
         console.log('Error verifying email: ', error) //TODO: Handle this error
