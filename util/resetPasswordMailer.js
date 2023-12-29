@@ -2,7 +2,7 @@ require("dotenv").config()
 
 const nodemailer = require('nodemailer')
 
-const frontEndURL = process.env.LOCAL_MODE ? 'http://192.168.50.103:5173' : 'https://linkd-dev.netlify.app'
+const frontEndURL = process.env.LOCAL_MODE ? 'http://192.168.50.103:5173' : 'https://dev.getlinkd.ink'
 
 const sendResetPassEmail = async (unxid, user_email, token) => {
     try {
