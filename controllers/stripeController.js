@@ -107,8 +107,10 @@ exports.createCheckoutSession = async (req, res) => {
               },
             ],
             mode: 'subscription',
+            subscription_data: {
+                trial_period_days: 7,
+                },
             allow_promotion_codes: true,
-            trial_period_days: 7,
             success_url: `${DOMAIN}?success=true&session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${DOMAIN}?canceled=true`,
             automatic_tax: { enabled: true },
