@@ -9,8 +9,7 @@ exports.stripeWebhook = async (req, res) => {
     try {
         let event = req.body
 
-        // const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
-        const endpointSecret = 'whsec_9a4998efca4dc7aa7153e533f42d61d8508befa4945b645969c14ae4a45ce269'
+        const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
         if(endpointSecret){
             const signiture = req.headers['stripe-signature']
