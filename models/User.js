@@ -838,6 +838,34 @@ class User {
         }
     }
 
+    getCustomerEmailByCustomerId = async (customer_id) => {
+        try {
+            const user = await db.collection('users').findOne({ attr1: customer_id })
+
+            return {email: user.user_email, userName: user.user_name}
+        } catch (error) {
+            console.log(error) //TODO: Handle this error
+            return false
+        }
+    }
+
+    static async updatePhotosLikes(image_id, action) {
+        try {
+            if(action === 'add'){
+                await db.collection('client-uploaded-images').updateOne({ image_id: image_id }, { $inc: { num_likes: 1 } })
+            }else if(action === 'remove'){
+                await db.collection('client-uploaded-images').updateOne({ image_id: image_id }, { $inc: { num_likes: -1 } })
+            }else{
+                return false
+            }
+
+            return true
+        } catch (error) {
+            console.log('Error Updating Photo Likes: ', error) //TODO: Handle this error (LOG)
+            return false
+        }
+    }
+
 
 }
     

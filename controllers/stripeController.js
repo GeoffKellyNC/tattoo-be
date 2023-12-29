@@ -1,5 +1,6 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const User = require('../models/User');
+const sendTrialWillEndEmail = require('../emailFuncitons/trialEnding')
 
 const DOMAIN = process.env.DOMAIN;
 
@@ -80,6 +81,13 @@ exports.stripeWebhook = async (req, res) => {
                 console.log('invoiceData: ', invoiceData) //!REMOVE
                 console.log('id: ', id) //!REMOVE
                 await User.updateUserSubscription(id, 'monthly', true)
+            case 'customer.subscription.trial_will_end':
+                subscription = event.data.object;
+                customerId = subscription.customer;
+                const {email, userName} = await User.getCustomerEmailByCustomerId(customerId)
+                if (!email) break;
+                await sendTrialWillEndEmail(email, userName)
+                break;
             default:
                 console.log(`Unhandled event type ${event.type}.`);
         }
@@ -114,7 +122,7 @@ exports.createCheckoutSession = async (req, res) => {
             ],
             mode: 'subscription',
             subscription_data: {
-                trial_period_days: 7,
+                trial_period_days: 14,
                 },
             allow_promotion_codes: true,
             success_url: `${DOMAIN}?success=true&session_id={CHECKOUT_SESSION_ID}`,

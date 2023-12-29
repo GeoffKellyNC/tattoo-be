@@ -73,6 +73,10 @@ router
     .route('/get-contact-details')
     .get(userControllers.getContactDetails)
 
+router
+    .route('/update-photo-like')
+    .post(userControllers.updatePhotoLikes)
+
 
     
 

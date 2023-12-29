@@ -360,5 +360,24 @@ exports.getContactDetails = async (req, res) => {
     }
 }
 
+exports.updatePhotoLikes = async (req, res) => {
+    try {
+        const { photo_id, action } = req.body;
+
+        const updatedData = await User.updatePhotoLikes(photo_id, action);
+
+        if (!updatedData) {
+            res.status(500).json({ message: 'Failed to update user data.' });
+            return;
+        }
+
+        res.status(200).json({ message: `Updated!` });
+        
+    } catch (error) {
+        console.log('Error updating user data:', error);
+        res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    }
+}
+
 
 
