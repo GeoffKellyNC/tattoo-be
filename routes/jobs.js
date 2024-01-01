@@ -72,5 +72,9 @@ router
     .route('/get-bid-data')
     .get(jobControllers.getAcceptedBidData)
 
+router
+    .route('/delete-job')
+    .post(jobControllers.deleteJob)
+
 
 module.exports = router;

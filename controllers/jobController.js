@@ -429,3 +429,29 @@ exports.getAcceptedBidData = async (req, res) => {
 }
 
 
+exports.deleteJob = async (req, res) => {
+    try{
+        const { jobId, ownerId } = req.body
+
+        if(!jobId || !ownerId){
+            res.status(400).json({message: 'Error: Invalid Job ID!'})
+            return
+        }
+
+        const deletedJob = await Job.deleteJob(jobId, ownerId)
+
+        if(!deletedJob){
+            res.status(400).json({message: 'Error deleting job'})
+            return
+        }
+
+        res.status(200).json({ message: 'Job deleted successfully', data: deletedJob })
+
+    } catch (error) {
+        console.log('Error deleting job: ', error) //TODO: Handle this error
+        res.status(500).json({ message: 'Error deleting job', error })
+        return
+    } 
+}
+
+

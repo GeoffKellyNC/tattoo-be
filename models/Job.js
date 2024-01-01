@@ -134,7 +134,7 @@ class Job {
 
     static async getJobByOwnerId(owner_id){
         try{
-            const jobs = await db.collection('active-user-jobs').find({owner_id: owner_id}).toArray()
+            const jobs = await db.collection('active-user-jobs').find({owner_id: owner_id, is_deleted: false, is_active: true}).toArray()
             return jobs
         }catch(err){
             console.log('Error getting jobs by owner id: ', err) //TODO: Handle this error
@@ -552,6 +552,14 @@ async setJobLocationCords(job_id, owner_id, zipcode){
                     is_deleted: true,
                     date_deleted: new Date()
                 }
+            
+            })
+
+            //TODO Delete document from active-client-jobs
+
+            await db.collection('accepted-client-jobs').deleteOne({
+                job_id,
+                owner_id
             
             })
 
