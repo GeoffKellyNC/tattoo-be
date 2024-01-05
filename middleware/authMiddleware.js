@@ -8,7 +8,8 @@ async function authMiddleware(req, res, next) {
             Route Hit!
             Current time: ${formatedDate}
             req.path: ${req.path}
-            jwtToken: ${req.headers['auth-token']}
+            unxid: ${req.headers['user_unx_id'] ? req.headers['user_unx_id'] : 'No unxid'}
+
         `)
         const excludedPaths = ['login', 'register', 'check-user-name', 'verify-email', 'reset-password-verify','reset-password', 'stripe', 'check-email' ]; 
 
