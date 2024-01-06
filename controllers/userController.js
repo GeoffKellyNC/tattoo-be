@@ -2,6 +2,7 @@ const User = require('../models/User')
 const Auth = require('../models/Auth')
 const { storage, bucket } = require('../google/gcs-img-config');
 const sendVerificationEmail = require('../util/emailVerifyMailer');
+const customConsole = require('../util/customConsole');
 
 
 // Return True if username is taken and false if it is available
@@ -45,6 +46,14 @@ exports.createUser = async (req, res) => {
         const verificationCode = await Auth.createVerificationCode(data.unxid)
 
         await sendVerificationEmail(data.unxid, data.user_email, verificationCode)
+
+        customConsole({
+            unxid: data.unxid,
+            path: req.path,
+            metaData: {
+                message: 'User created successfully',
+            }
+        })
         
         res.status(200).json({message: 'User created successfully', data: data.unxid})
 

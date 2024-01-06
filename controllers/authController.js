@@ -3,6 +3,7 @@ const Auth = require('../models/Auth')
 const sendResetPassEmail = require('../util/resetPasswordMailer')
 const sanitizeUserData = require('../util/sanitizeUserData')
 const socketService = require('../services/socketService')
+const customConsole = require('../util/customConsole')
 
 
 exports.login = async (req, res) => {
@@ -60,6 +61,15 @@ exports.login = async (req, res) => {
         await User.updateUserDataUXID('online_status', 'online', userData.unxid)
 
         const sanitizedData = await sanitizeUserData(userData)
+
+        customConsole({
+            unxid: userData.unxid,
+            path: req.path,
+            metaData: {
+                message: 'User Logged In',
+                account_type: userData.account_type,
+            }
+        })
 
 
         res.status(200).json({userData: sanitizedData, jwtToken, userProfileDetails, userContactDetails, clientUploadedImages, decoded_data, artistDetials: artistDetials ? artistDetials : null})
