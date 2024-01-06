@@ -144,6 +144,8 @@ class User {
 
             await db.collection('user-tos-agreement').insertOne({ user_unxid: unxid, tos: tos, date: todaysFormattedDate })
 
+            return true
+
         } catch (error) {
             console.log(error) //TODO: Handle this error
             return false
