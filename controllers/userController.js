@@ -40,7 +40,7 @@ exports.createUser = async (req, res) => {
         const data = await user.create_user_in_db()
         await user.setUpDatabaseDefaultsClient(data.unxid)
 
-        user.userAcceptsTOS(data.unxid, true)
+        await user.userAcceptsTOS(data.unxid, true)
 
         if(data.isArtist){
             await User.setUpArtistDefaults(data.unxid)
