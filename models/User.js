@@ -134,6 +134,22 @@ class User {
         }
     }
 
+    userAcceptsTOS = async (unxid, tos) => {
+        try {
+            const todaysFormattedDate = new Date(Date.now()).toLocaleString('en-US', { timeZone: 'America/New_York' });
+
+            if(!unxid || !tos){
+                return false
+            }
+
+            await db.collection('user-tos-agreement').insertOne({ user_unxid: unxid, tos: tos, date: todaysFormattedDate })
+
+        } catch (error) {
+            console.log(error) //TODO: Handle this error
+            return false
+        }
+    }
+
     static getUserPassword = async (unxid) => {
         try {
             const user = await db.collection('users').findOne({ unxid: unxid })
