@@ -573,6 +573,14 @@ class User {
                 },
                 {
                     $lookup: {
+                        from: "client-uploaded-images",
+                        localField: "unxid",
+                        foreignField: "user_unxid",
+                        as: "userImages"
+                    }
+                },
+                {
+                    $lookup: {
                         from: "client-profile-image",
                         let: { user_unxid: "$unxid" },
                         pipeline: [

@@ -322,6 +322,14 @@ class Job {
                 },
                 {
                     $lookup: {
+                        from: "client-user-details",
+                        localField: "user_unxid",
+                        foreignField: "user_unxid",
+                        as: "userDetails"
+                    }
+                },
+                {
+                    $lookup: {
                         from: "client-uploaded-images",
                         localField: "user_unxid",
                         foreignField: "user_unxid",
@@ -340,7 +348,7 @@ class Job {
                         "user.account_status": 0,
                         "user_isMod": 0,
                         "user.isAdmin": 0,
-                        attr1: 0,
+                        "user.attr1": 0,
                         attr2: 0,
                         attr3: 0,
                         attr4: 0,
