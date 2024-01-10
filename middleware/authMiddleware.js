@@ -30,7 +30,6 @@ async function authMiddleware(req, res, next) {
         }
 
         if(jwtToken === '43980hjos002ijnlknsd'){
-            console.log('USED ADMING TOKEN')//! REMOVE
             return next();
         }
     
