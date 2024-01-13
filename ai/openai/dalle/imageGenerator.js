@@ -33,4 +33,4 @@ const generateAIModel = async (unxid, userPrompt, userStyle) => {
 
 }
 
-modeule.exports = generateAIModel
+module.exports = generateAIModel
