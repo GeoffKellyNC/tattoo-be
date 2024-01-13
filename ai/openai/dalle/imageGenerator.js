@@ -4,7 +4,7 @@ const IMAGE_MODEL = 'dall-e-3'
 
 
 
-export const generateAIModel = async (unxid, userPrompt, userStyle) => {
+const generateAIModel = async (unxid, userPrompt, userStyle) => {
     try {
 
         const openAi = new OpenAI
@@ -32,3 +32,5 @@ export const generateAIModel = async (unxid, userPrompt, userStyle) => {
     }
 
 }
+
+modeule.exports = generateAIModel

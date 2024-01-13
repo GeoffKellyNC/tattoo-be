@@ -1,6 +1,6 @@
 const aiModerationText  = require('../ai/openai/moderation/textModeration')
 const socketService = require('../services/socketService')
-const { generateAIModel } = require('../ai/openai/dalle/imageGenerator')
+const generateAIModel = require('../ai/openai/dalle/imageGenerator')
 
 
 
