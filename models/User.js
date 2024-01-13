@@ -33,7 +33,7 @@ class User {
         this.session_token = null
         this.account_status = 'active',
         this.online_status = 'offline'
-        this.subscription_active = false
+        this.subscription_active = true
         this.subscription_type = null
         this.subscription_start_date = null
         this.subscription_end_date = null
