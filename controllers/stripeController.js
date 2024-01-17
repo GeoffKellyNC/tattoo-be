@@ -126,7 +126,7 @@ exports.createCheckoutSession = async (req, res) => {
             //     },
             allow_promotion_codes: true,
             success_url: `${DOMAIN}?success=true&session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${DOMAIN}?canceled=true`,
+            cancel_url: `${DOMAIN}?canceled=true?unxid=${unxid}`,
             automatic_tax: { enabled: true },
             metadata: {unxid}
           });
