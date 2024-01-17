@@ -1,7 +1,7 @@
 require("dotenv").config()
 const nodemailer = require('nodemailer');
 
-const SERVER_URL = process.env.LOCAL_MODE ? 'http://192.168.50.103:9001' : process.env.SERVER_URL
+const SERVER_URL = process.env.LOCAL_MODE ? 'http://localhost:5173' : process.env.SERVER_URL
 
 const sendVerificationEmail = async (unxid, user_email, token) => {
     try {
