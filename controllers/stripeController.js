@@ -121,9 +121,9 @@ exports.createCheckoutSession = async (req, res) => {
               },
             ],
             mode: 'subscription',
-            subscription_data: {
-                trial_period_days: 14,
-                },
+            // subscription_data: {
+            //     trial_period_days: 14,
+            //     },
             allow_promotion_codes: true,
             success_url: `${DOMAIN}?success=true&session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${DOMAIN}?canceled=true`,
@@ -181,8 +181,9 @@ exports.createPortalSession = async (req, res) => {
   exports.createPortalSessionWithCustomerId = async (req, res) => {
     try {
         const customerId = req.body.customer_id
+        const unx_id = req.headers['user_unx_id']
 
-        const returnUrl = DOMAIN;
+        const returnUrl = `${DOMAIN}/user/client/${unx_id}`;
       
         const portalSession = await stripe.billingPortal.sessions.create({
           customer: customerId,
